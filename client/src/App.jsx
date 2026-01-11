@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import JoinPro from './pages/Join';
-import Contact from './pages/contact';
+import Contact from './pages/Contact';
 import BookService from './pages/BookService';
 
 const App = () => {
