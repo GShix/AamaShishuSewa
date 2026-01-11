@@ -6,13 +6,15 @@ import {
   ShieldAlert, Sun, Facebook, Instagram, Mail,
   ChevronDown, HelpCircle, ShieldCheck, Menu, X 
 } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Home = () => {
   const navigate = useNavigate();
   const [language, setLanguage] = useState('ne');
   const [activeFaq, setActiveFaq] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  useDocumentTitle(language === 'ne' ? 'गृहपृष्ठ' : 'Home');
+  
   const translations = {
     ne: {
       nav: [
