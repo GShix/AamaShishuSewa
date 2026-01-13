@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import { useLocation } from 'react-router-dom';
 
 const PublicLayout = ({ children }) => {
   const [language, setLanguage] = useState('ne');
+
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
 
   const translations = {
     ne: {
@@ -13,7 +20,7 @@ const PublicLayout = ({ children }) => {
         { name: 'प्रोफेसनल', path: '/join_us' },
         { name: 'सम्पर्क', path: '/contact' },
         { name: 'लग इन', path: '/login', type: 'auth' },
-        { name: 'दर्ता', path: '/register', type: 'auth' },
+        // { name: 'दर्ता', path: '/register', type: 'auth' },
         { name: 'ड्यासबोर्ड', path: '/dashboard', type: 'private' }
       ],
       hero: {
@@ -47,7 +54,7 @@ const PublicLayout = ({ children }) => {
         { name: 'Join Us', path: '/join_us' },
         { name: 'Contact', path: '/contact' },
         { name: 'Login', path: '/login', type: 'auth' },
-        { name: 'Register', path: '/register', type: 'auth' },
+        // { name: 'Register', path: '/register', type: 'auth' },
         { name: 'Dashboard', path: '/dashboard', type: 'private' }
       ],
       hero: {

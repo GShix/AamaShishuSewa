@@ -28,7 +28,7 @@ const Home = () => {
         { name: 'प्रोफेसनल', path: '/join_us' },
         { name: 'सम्पर्क', path: '/contact' },
         { name: 'लग इन', path: '/login', type: 'auth' },
-        { name: 'दर्ता', path: '/register', type: 'auth' },
+        // { name: 'दर्ता', path: '/register', type: 'auth' },
         { name: 'ड्यासबोर्ड', path: '/dashboard', type: 'private' }
       ],
       hero: {
@@ -62,7 +62,7 @@ const Home = () => {
         { name: 'Join Us', path: '/join_us' },
         { name: 'Contact', path: '/contact' },
         { name: 'Login', path: '/login', type: 'auth' },
-        { name: 'Register', path: '/register', type: 'auth' },
+        // { name: 'Register', path: '/register', type: 'auth' },
         { name: 'Dashboard', path: '/dashboard', type: 'private' }
       ],
       hero: {
@@ -164,7 +164,7 @@ const Home = () => {
         </div>
 
         {/* Mobile Menu Overlay */}
-        <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'hidden'}`}>
           <div className="flex flex-col p-6 space-y-2 bg-rose-200">
             {t.nav.filter(item => {
               if (item.type === 'auth') return !isAuthenticated;

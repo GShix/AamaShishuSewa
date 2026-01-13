@@ -75,7 +75,7 @@ const Header = ({ language, setLanguage, t }) => {
       </div>
 
       {/* Mobile Menu Overlay */}
-      <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'hidden'}`}>
         <div className="flex flex-col p-6 space-y-2 bg-rose-200">
           {/* Added ?. to safely access nav */}
           {t?.nav?.filter(item => {

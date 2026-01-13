@@ -10,6 +10,8 @@ import JoinUs from './pages/JoinUs';
 import Services from './pages/Services';
 import BookService from './pages/BookService';
 import Contact from './pages/Contact';
+import ScrollToTop from './components/common/ScrollToTop';
+import ForgotPassword from './pages/ForgetPassword';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -44,6 +46,7 @@ const PublicRoute = ({ children }) => {
 function AppContent() {
   return (
     <Router>
+      <ScrollToTop/>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -68,6 +71,14 @@ function AppContent() {
           element={
             <PublicRoute>
               <Login />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/forget_password" 
+          element={
+            <PublicRoute>
+              <ForgotPassword />
             </PublicRoute>
           } 
         />
