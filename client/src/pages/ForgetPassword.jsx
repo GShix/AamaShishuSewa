@@ -283,11 +283,11 @@ const ForgotPassword = () => {
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-br from-red-400 to-orange-400 p-4 rounded-full shadow-lg">
+            <div className="bg-linear-to-br from-red-400 to-orange-400 p-4 rounded-full shadow-lg">
               <Heart className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-linear-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-2">
             आमा शिशु सेवा
           </h1>
           <p className="text-gray-600">{t.subtitle}</p>

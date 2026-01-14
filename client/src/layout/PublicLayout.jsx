@@ -19,7 +19,8 @@ const PublicLayout = ({ children }) => {
         { name: 'सेवाहरू', path: '/services' },
         { name: 'प्रोफेसनल', path: '/join_us' },
         { name: 'सम्पर्क', path: '/contact' },
-        { name: 'लग इन', path: '/login', type: 'auth' },
+        { name: 'क्यारियर्स', path: '/careers' },
+        // { name: 'लग इन', path: '/login', type: 'auth' },
         // { name: 'दर्ता', path: '/register', type: 'auth' },
         { name: 'ड्यासबोर्ड', path: '/dashboard', type: 'private' }
       ],
@@ -53,7 +54,8 @@ const PublicLayout = ({ children }) => {
         { name: 'Services', path: '/services' },
         { name: 'Join Us', path: '/join_us' },
         { name: 'Contact', path: '/contact' },
-        { name: 'Login', path: '/login', type: 'auth' },
+        { name: 'Careers', path: '/careers' },
+        // { name: 'Login', path: '/login', type: 'auth' },
         // { name: 'Register', path: '/register', type: 'auth' },
         { name: 'Dashboard', path: '/dashboard', type: 'private' }
       ],

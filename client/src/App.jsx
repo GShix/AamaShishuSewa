@@ -12,6 +12,8 @@ import BookService from './pages/BookService';
 import Contact from './pages/Contact';
 import ScrollToTop from './components/common/ScrollToTop';
 import ForgotPassword from './pages/ForgetPassword';
+import Careers from './pages/Careers';
+import JobOpenings from './pages/JobOpening';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -63,6 +65,22 @@ function AppContent() {
           element={
             <PublicRoute>
               <JoinUs />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/job_openings" 
+          element={
+            <PublicRoute>
+              <JobOpenings />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/careers" 
+          element={
+            <PublicRoute>
+              <Careers />
             </PublicRoute>
           } 
         />
