@@ -13,7 +13,7 @@ import Contact from './pages/Contact';
 import ScrollToTop from './components/common/ScrollToTop';
 import ForgotPassword from './pages/ForgetPassword';
 import Careers from './pages/Careers';
-import JobOpenings from './pages/JobOpening';
+import Apply from './pages/Apply';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -30,7 +30,7 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-// Public Route (redirect if already logged in)
+// Public Route (redirect if already logged in - use for Auth pages like Login/Register)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -50,82 +50,23 @@ function AppContent() {
     <Router>
       <ScrollToTop/>
       <Routes>
-        {/* Public Routes */}
+        {/* --- TRULY PUBLIC ROUTES (Accessible to everyone) --- */}
         <Route path="/" element={<Home />} />
-        <Route 
-          path="/services" 
-          element={
-            <PublicRoute>
-              <Services />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/join_us" 
-          element={
-            <PublicRoute>
-              <JoinUs />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/job_openings" 
-          element={
-            <PublicRoute>
-              <JobOpenings />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/careers" 
-          element={
-            <PublicRoute>
-              <Careers />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/login" 
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/forget_password" 
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/register" 
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/book" 
-          element={
-            <PublicRoute>
-              <BookService />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/contact" 
-          element={
-            <PublicRoute>
-              <Contact />
-            </PublicRoute>
-          } 
-        />
+        <Route path="/services" element={<Services />} />
+        <Route path="/contact" element={<Contact />} />
+        
+        {/* Career pages should be accessible to both logged-in and guest users */}
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/careers/apply" element={<Apply />} />
 
-        {/* Protected Routes */}
+        {/* --- AUTH REDIRECT ROUTES (Redirects to dashboard if logged in) --- */}
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/forget_password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} />
+        <Route path="/book" element={<PublicRoute><BookService /></PublicRoute>} />
+
+        {/* --- PROTECTED ROUTES (Requires login) --- */}
         <Route
           path="/dashboard"
           element={
@@ -135,7 +76,7 @@ function AppContent() {
           }
         />
 
-        {/* Catch all - redirect to home */}
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
