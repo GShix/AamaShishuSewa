@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Heart, LogIn, Phone, Lock, AlertCircle, Loader } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Login = () => {
+  useDocumentTitle('Login - आमा शिशु सेवा');
   const navigate = useNavigate();
   const { login, loading, error: authError } = useAuth();
   const [language, setLanguage] = useState('ne');

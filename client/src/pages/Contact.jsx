@@ -1,8 +1,10 @@
 import React from 'react';
 import { Phone, Mail, MapPin, Calendar, Clock, MessageSquare } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Contact = () => {
+  useDocumentTitle("Contact Us - We're Here to Help");
   return (
     <PublicLayout>
       <div className="bg-white min-h-screen">

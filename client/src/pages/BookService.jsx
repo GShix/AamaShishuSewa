@@ -5,8 +5,10 @@ import {
   ShieldCheck, Star, Heart 
 } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const BookService = () => {
+  useDocumentTitle('Book a Service - आमा र शिशु सेवा');
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     service: '',

@@ -3,13 +3,15 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Heart, UserPlus, Mail, Phone, Lock, User, MapPin, AlertCircle, Loader, CheckCircle } from 'lucide-react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Register = () => {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
   const [language, setLanguage] = useState('ne');
   const [currentStep, setCurrentStep] = useState(1);
-  
+  useDocumentTitle('Register - आमा शिशु सेवा');
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',

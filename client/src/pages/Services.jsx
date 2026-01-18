@@ -1,8 +1,11 @@
 import React from 'react';
 import { ShieldCheck, Heart, Star, Check, ArrowRight } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Services = ({ t }) => {
+
+  useDocumentTitle('Services - Our Specialized Care Plans');
   const serviceList = [
     {
       id: 'postpartum',

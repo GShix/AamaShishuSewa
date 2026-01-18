@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Send, CheckCircle, ShieldCheck } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Apply = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  useDocumentTitle('Apply for Job');
 
   const selectedJob = location.state?.job || { title: "General", eng: "Applicant" };
   const GOOGLE_FORM_BASE = "https://docs.google.com/forms/d/e/1FAIpQLSfP41sza2rZ1A7Z0ZlJTtaJg5TXdDihNAu_o18Ez-KJuMpeUA/viewform";
@@ -78,15 +80,15 @@ const Apply = () => {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-[#FDFCFB] py-12 px-4">
+      <div className="min-h-screen bg-[#FDFCFB] py-8 sm:py-10 px-4">
         <div className="max-w-3xl mx-auto">
-          <button onClick={() => navigate(-1)} className="flex items-center text-slate-400 font-bold mb-8 hover:text-slate-900 transition-all cursor-pointer">
+          <button onClick={() => navigate(-1)} className="flex items-center text-slate-400 font-bold mb-6 hover:text-slate-900 transition-all cursor-pointer">
             <ChevronLeft size={20} /> Back
           </button>
 
-          <header className="mb-10">
+          <header className="mb-8">
             <h1 className="text-4xl font-black text-slate-900 mb-2">आवेदन फारम</h1>
-            <p className="text-[#E67E7E] font-bold uppercase tracking-widest text-sm">
+            <p className="text-rose-500 font-bold uppercase tracking-widest text-sm">
               Role: {selectedJob.title} ({selectedJob.eng})
             </p>
           </header>
@@ -95,10 +97,10 @@ const Apply = () => {
             {/* Hidden field: Must match Google Form choice string exactly */}
             <input type="hidden" name="entry.155055816" value={`${selectedJob.title} (${selectedJob.eng})`} />
 
-            <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-sm border border-slate-100 space-y-10">
+            <div className="bg-white rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm border border-slate-100 space-y-8">
               
               {/* Personal Info */}
-              <section className="space-y-6">
+              <section className="space-y-4">
                 <div className="text-xl font-bold border-b pb-4 flex items-center italic">
                    <ShieldCheck className="mr-2 text-emerald-500" /> व्यक्तिगत विवरण (Personal)
                 </div>
@@ -123,7 +125,7 @@ const Apply = () => {
               </section>
 
               {/* Professional Info - UPDATED VALUES TO MATCH GOOGLE FORM */}
-              <section className="space-y-6">
+              <section className="space-y-4">
                 <div className="text-xl font-bold border-b pb-4 flex items-center italic">
                    <Send className="mr-2 text-blue-500" /> अनुभव र सीप (Skills)
                 </div>
@@ -180,7 +182,7 @@ const Apply = () => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className={`w-full py-6 rounded-3xl text-white font-black text-xl shadow-xl transition-all cursor-pointer ${loading ? 'bg-slate-400 animate-pulse' : 'bg-[#E67E7E] hover:bg-[#d66d6d] hover:scale-[1.01]'}`}
+                className={`w-full py-4 rounded-3xl text-white font-black text-xl shadow-xl transition-all cursor-pointer ${loading ? 'bg-slate-400 animate-pulse' : 'bg-rose-500 hover:bg-rose-600 hover:scale-[1.01]'}`}
               >
                 {loading ? 'Processing...' : 'Submit Application'}
               </button>

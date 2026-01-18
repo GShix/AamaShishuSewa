@@ -1,8 +1,10 @@
 import React from 'react';
 import { UserPlus, Award, Clock, Briefcase, FileText } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const JoinUs = () => {
+  useDocumentTitle('Join Us - Become a Caregiver with Us');
   return (
     <PublicLayout>
       <div className="py-8 lg:py-12 px-6 lg:px-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
