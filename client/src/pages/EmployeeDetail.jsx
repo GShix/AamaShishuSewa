@@ -39,13 +39,13 @@ const EmployeeDetail = () => {
             {/* Sidebar: Image and Stats */}
             <div className="space-y-6">
               <div className="relative group">
-                <div className="bg-white p-3 rounded-[3.5rem] shadow-2xl border border-slate-50 relative z-10">
-                  <img src={employee.image} alt={employee.name} className="w-full aspect-square rounded-[3rem] object-cover shadow-inner" />
+                <div className="bg-white p-3 rounded-4xl shadow-2xl border border-slate-50 relative z-10">
+                  <img src={employee.image} alt={employee.name} className="w-full aspect-square rounded-4xl object-cover shadow-inner"  />
                 </div>
                 <div className="absolute -inset-2 bg-emerald-500/10 rounded-[4rem] blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
               </div>
               
-              <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm text-center">
+              <div className="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm text-center">
                  <div className="inline-flex items-center justify-center w-12 h-12 bg-yellow-50 text-yellow-500 rounded-2xl mb-3">
                     <Award size={24} />
                  </div>
@@ -89,7 +89,7 @@ const EmployeeDetail = () => {
               </section>
 
               {/* Price and Action */}
-              <div className="p-8 bg-slate-900 rounded-[3rem] shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="p-8 bg-slate-900 rounded-4xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
                   <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">{t.employeeDetail.feeLabel}</p>
                   <div className="flex items-baseline text-white">
@@ -98,7 +98,7 @@ const EmployeeDetail = () => {
                   </div>
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto">
-                   <button className="flex-grow sm:flex-none px-8 py-3 bg-emerald-500 text-white rounded-2xl font-black text-lg hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 cursor-pointer">
+                   <button className="flex-grow sm:flex-none px-4 sm:px-8 py-3 bg-emerald-500 text-white rounded-2xl font-black text-lg hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 cursor-pointer text-nowrap">
                      {t.employeeDetail.bookBtn}
                    </button>
                    <button className="p-5 bg-slate-800 text-white rounded-2xl hover:bg-slate-700 transition-all cursor-pointer">
