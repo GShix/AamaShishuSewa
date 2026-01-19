@@ -16,6 +16,7 @@ import Careers from './pages/Careers';
 import Apply from './pages/Apply';
 import Leaderboard from './pages/Leaderboard';
 import EmployeeDetail from './pages/EmployeeDetail';
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -63,7 +64,7 @@ function AppContent() {
 
         {/* Leaderboard */}
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/employee/:id" element={<EmployeeDetail />} />
+        <Route path="/employee_profile/:id" element={<EmployeeDetail />} />
 
         {/* --- AUTH REDIRECT ROUTES (Redirects to dashboard if logged in) --- */}
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
@@ -79,6 +80,16 @@ function AppContent() {
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
+          }
+        />
+
+        {/* --- EMPLOYEE ROUTES (Protected) --- */}
+        <Route
+          path="/employee/dashboard"
+          element={
+            // <ProtectedRoute>
+              <EmployeeDashboard />
+            // </ProtectedRoute>
           }
         />
 

@@ -147,7 +147,7 @@ const Leaderboard = () => {
             <div className="relative flex justify-center items-end gap-2 md:gap-12">
               {podium.map((emp) => (
                 <div key={emp.id} className={`flex flex-col items-center transition-transform hover:scale-105 ${emp.rank === 1 ? 'z-10 -translate-y-8' : ''}`}>
-                  <div className="relative cursor-pointer" onClick={() => navigate(`/employee/${emp.id}`)}>
+                  <div className="relative cursor-pointer" onClick={() => navigate(`/employee_profile/${emp.id}`)}>
                     {emp.rank === 1 && <Crown className="absolute -top-10 left-1/2 -translate-x-1/2 text-yellow-400 fill-yellow-400 animate-pulse" size={40} />}
                     <div className="relative">
                         <img src={emp.image} className={`rounded-full border-4 border-white shadow-xl object-cover ${emp.rank === 1 ? 'w-28 h-28 md:w-40 md:h-40' : 'w-20 h-20 md:w-28 md:h-28'}`} alt="" />
