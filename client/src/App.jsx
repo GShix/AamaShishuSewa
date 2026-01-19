@@ -14,6 +14,8 @@ import ScrollToTop from './components/common/ScrollToTop';
 import ForgotPassword from './pages/ForgetPassword';
 import Careers from './pages/Careers';
 import Apply from './pages/Apply';
+import Leaderboard from './pages/Leaderboard';
+import EmployeeDetail from './pages/EmployeeDetail';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -59,11 +61,15 @@ function AppContent() {
         <Route path="/careers" element={<Careers />} />
         <Route path="/careers/apply" element={<Apply />} />
 
+        {/* Leaderboard */}
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/employee/:id" element={<EmployeeDetail />} />
+
         {/* --- AUTH REDIRECT ROUTES (Redirects to dashboard if logged in) --- */}
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forget_password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-        <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} />
+        {/* <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} /> */}
         <Route path="/book" element={<PublicRoute><BookService /></PublicRoute>} />
 
         {/* --- PROTECTED ROUTES (Requires login) --- */}

@@ -59,7 +59,7 @@ const JoinUs = () => {
               <span>Our team will contact you for a verification interview within 48 hours.</span>
             </div>
             
-            <button className="w-full py-4 bg-rose-500 text-white rounded-xl font-bold text-lg hover:bg-rose-600 shadow-lg shadow-rose-100 transition">
+            <button className="w-full py-4 bg-rose-500 text-white rounded-xl font-bold text-lg hover:bg-rose-600 shadow-lg shadow-rose-100 transition cursor-pointer">
               Submit Application
             </button>
           </form>
