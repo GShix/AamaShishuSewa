@@ -34,6 +34,7 @@ const Header = ({ language, setLanguage, t }) => {
             </h1>
             <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-slate-500 mt-1">
               {language === 'ne' ? 'Aama Shishu Sewa' : 'Maternal & Infant Care'}
+              {/* Care for your baby, care for your home. */}
             </p>
           </div>
         </div>
