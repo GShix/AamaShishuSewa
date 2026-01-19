@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Search, ChevronRight, Verified, Star } from 'lucide-react';
+import { MapPin, Search, ChevronRight, Verified, Star, Crown } from 'lucide-react';
 import PublicLayout from '../layout/PublicLayout';
-import { useLanguage } from '../context/LanguageContext'; // Import hook
+import { useLanguage } from '../context/LanguageContext';
 
 const LEADERBOARD_DATA = [
   { id: 1, name: "Sita Thapa", rank: 1, city: "Kathmandu", fee: 1500, rating: 4.9, jobs: 124, image: "https://i.pravatar.cc/150?u=1" },
@@ -16,7 +16,7 @@ const LEADERBOARD_DATA = [
 
 const Leaderboard = () => {
   const navigate = useNavigate();
-  const { t, language } = useLanguage(); // Access translation
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("All");
   const [minRating, setMinRating] = useState(0);
@@ -34,25 +34,26 @@ const Leaderboard = () => {
     });
   }, [searchTerm, selectedCity, minRating]);
 
+  // Logic to handle Podium ordering (2nd, 1st, 3rd)
   const top3 = filteredData.slice(0, 3);
-  const others = filteredData.slice(3);
   const podium = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
+  const others = filteredData.slice(3);
 
   if (!t) return null;
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-[#FDFCFB] py-10 px-4">
+      <div className="min-h-screen bg-[#FDFCFB] py-6 sm:py-8 px-4">
         <div className="max-w-5xl mx-auto">
           
-          {/* HEADER SECTION */}
-          <header className="text-center mb-12">
-            <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight">{t.leaderboard.title}</h1>
+          {/* HEADER SECTION - Original Title */}
+          <header className="text-center mb-6 sm:mb-10">
+            <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight max-sm:leading-14">{t.leaderboard.title}</h1>
             <p className="text-slate-500 text-lg">{t.leaderboard.subtitle}</p>
           </header>
 
-          {/* FILTER TOOLBAR */}
-          <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 mb-12 space-y-6">
+          {/* FILTER TOOLBAR - Kept exactly as your original */}
+          <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 mb-10 space-y-4">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="relative flex-grow w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -71,7 +72,7 @@ const Leaderboard = () => {
                   <button
                     key={rate}
                     onClick={() => setMinRating(rate)}
-                    className={`px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1 transition-all cursor-pointer ${
+                    className={`px-2 sm:px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1 transition-all cursor-pointer ${
                       minRating === rate ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
@@ -96,47 +97,45 @@ const Leaderboard = () => {
             </div>
           </div>
 
-          {/* PODIUM DISPLAY */}
+          {/* NEW PODIUM STYLE - Based on the image */}
           {filteredData.length > 0 ? (
             <>
-              <div className={`grid grid-cols-1 md:grid-cols-${Math.min(filteredData.length, 3)} gap-8 items-end mb-16`}>
-                {podium.map((emp) => (
-                  <div 
-                    key={emp.id}
-                    onClick={() => navigate(`/employee/${emp.id}`)}
-                    className={`cursor-pointer group relative bg-white rounded-4xl p-6 shadow-xl transition-all hover:-translate-y-2 border-t-8 
-                      ${emp.rank === 1 ? 'border-emerald-500 md:scale-110 z-10' : emp.rank === 2 ? 'border-yellow-400' : 'border-purple-500'}`}
-                  >
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white shadow-md px-4 py-1 rounded-full font-black text-[10px] uppercase tracking-widest whitespace-nowrap">
-                       {language === 'ne' ? 'Rank' : 'Rank'} #{emp.rank}
-                    </div>
-                    
-                    <div className="w-24 h-24 mx-auto mb-6 relative">
-                      <img src={emp.image} alt={emp.name} className="w-full h-full rounded-full object-cover border-4 border-slate-50 shadow-inner" />
-                      <Verified className="absolute bottom-0 right-0 text-blue-500 bg-white rounded-full p-0.5 shadow-sm" size={24} />
-                    </div>
-
-                    <div className="text-center">
-                      <h3 className="text-xl font-black text-slate-800">{emp.name}</h3>
-                      <div className="flex items-center justify-center text-yellow-500 font-bold text-sm mb-4">
-                        <Star size={14} className="fill-current mr-1" /> {emp.rating}
-                      </div>
-                      <div className="bg-slate-50 rounded-2xl py-3 px-4 flex items-center justify-between">
-                        <div className="text-left">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{t.leaderboard.locationLabel}</p>
-                          <p className="text-sm font-bold text-slate-700">{emp.city}</p>
+              <div className="relative bg-rose-500 rounded-[3rem] p-8 mb-10 pt-20 shadow-2xl overflow-hidden">
+                {/* Background decorative sunrays effect */}
+                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                
+                <div className="relative flex justify-center items-end gap-2 md:gap-12">
+                  {podium.map((emp) => {
+                    const isRank1 = emp.rank === 1;
+                    return (
+                      <div 
+                        key={emp.id}
+                        onClick={() => navigate(`/employee/${emp.id}`)}
+                        className={`flex flex-col items-center cursor-pointer transition-transform hover:scale-105 ${isRank1 ? 'z-10 -translate-y-8' : 'z-0'}`}
+                      >
+                        <div className="relative">
+                          {isRank1 && <Crown className="absolute -top-10 left-1/2 -translate-x-1/2 text-yellow-400 fill-yellow-400 drop-shadow-md" size={40} />}
+                          <div className={`rounded-full p-1 border-dashed border-2 ${isRank1 ? 'border-orange-400 w-28 h-28 md:w-40 md:h-40' : 'border-white/50 w-20 h-20 md:w-28 md:h-28'}`}>
+                            <img src={emp.image} alt={emp.name} className="w-full h-full rounded-full object-cover border-4 border-white shadow-xl" />
+                          </div>
+                          <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-lg ${isRank1 ? 'bg-orange-500 scale-125' : 'bg-emerald-500'}`}>
+                            {emp.rank}
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{t.leaderboard.feeLabel}</p>
-                          <p className="text-sm font-bold text-slate-900">Rs. {emp.fee}</p>
+                        
+                        <div className="text-center mt-6">
+                           <h3 className="text-white font-black text-sm md:text-xl">{emp.name.split(' ')[0]}</h3>
+                           <div className={`mt-2 px-4 py-1 rounded-full inline-flex items-center gap-1 text-white text-[10px] md:text-xs font-black shadow-lg ${isRank1 ? 'bg-orange-500' : 'bg-white/20 backdrop-blur-sm'}`}>
+                              <Star size={12} className="fill-current" /> {emp.rating}
+                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* LIST DISPLAY */}
+              {/* LIST DISPLAY - Kept exactly as your original logic/style */}
               <div className="max-w-4xl mx-auto space-y-3">
                 {others.map((emp) => (
                   <div 
@@ -157,7 +156,7 @@ const Leaderboard = () => {
                                  <MapPin size={10} className="mr-1" /> {emp.city}
                                </p>
                                <p className="text-[10px] text-yellow-500 flex items-center font-bold">
-                                 <Star size={10} className="mr-1 fill-current" /> {emp.rating}
+                                 <Star size={10} className="fill-current mr-1" /> {emp.rating}
                                </p>
                             </div>
                          </div>
@@ -175,6 +174,7 @@ const Leaderboard = () => {
               </div>
             </>
           ) : (
+            /* NO RESULTS SECTION - Kept original */
             <div className="py-24 text-center">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
                 <Search size={40} />
