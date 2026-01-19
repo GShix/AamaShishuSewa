@@ -89,7 +89,7 @@ const EmployeeDetail = () => {
               </section>
 
               {/* Price and Action */}
-              <div className="p-8 bg-slate-900 rounded-4xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="p-8 bg-slate-900 rounded-4xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                   <p className="text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-1">{t.employeeDetail.feeLabel}</p>
                   <div className="flex items-baseline text-white">

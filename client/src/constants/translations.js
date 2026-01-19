@@ -21,7 +21,7 @@ export const TRANSLATIONS = {
       ctaBook: 'सेवा लिनुहोस्',
       ctaJoin: 'टोलीमा सामेल हुनुहोस्'
     },
-    stats: { happy: '५०+ सन्तुष्ट आमा', pros: '१०+ प्रमाणित सुसारे' },
+    stats: { happy: '१५०+ सन्तुष्ट आमा', pros: '३०+ प्रमाणित सुसारे' },
     sections: { 
       mission: 'हाम्रो लक्ष्य र उद्देश्य',
       conduct: 'प्रोफेसनल आचारसंहिता',
@@ -176,7 +176,7 @@ export const TRANSLATIONS = {
       ctaBook: 'Book a Service',
       ctaJoin: 'Join our Team'
     },
-    stats: { happy: '50+ Happy Mothers', pros: '10+ Certified Pros' },
+    stats: { happy: '150+ Happy Mothers', pros: '30+ Certified Pros' },
     sections: { 
       mission: 'Mission & Vision',
       conduct: 'Professional Code of Conduct',

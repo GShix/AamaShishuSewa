@@ -100,9 +100,25 @@ const Leaderboard = () => {
           {/* NEW PODIUM STYLE - Based on the image */}
           {filteredData.length > 0 ? (
             <>
-              <div className="relative bg-rose-500 rounded-[3rem] p-8 mb-10 pt-20 shadow-2xl overflow-hidden">
-                {/* Background decorative sunrays effect */}
+              <div className="relative bg-gradient-to-br from-rose-500 via-pink-500 to-orange-500 rounded-[3rem] p-8 mb-10 pt-20 shadow-2xl overflow-hidden">
+                {/* Background decorative elements */}
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                
+                {/* Celebratory Confetti & Stickers */}
+                <div className="absolute top-4 left-8 text-yellow-300 opacity-80 text-4xl animate-bounce">🎉</div>
+                <div className="absolute top-12 right-12 text-yellow-300 opacity-70 text-3xl animate-pulse">⭐</div>
+                <div className="absolute top-8 left-[20%] text-pink-200 opacity-60 text-2xl">✨</div>
+                <div className="absolute top-6 right-[25%] text-yellow-200 opacity-70 text-3xl">🌟</div>
+                <div className="absolute bottom-20 left-4 text-orange-200 opacity-50 text-2xl rotate-12">🎊</div>
+                <div className="absolute bottom-24 right-8 text-pink-200 opacity-60 text-2xl -rotate-12">💫</div>
+                <div className="absolute top-16 left-[45%] text-yellow-300 opacity-40 text-xl">✨</div>
+                <div className="absolute bottom-32 left-[15%] text-orange-200 opacity-50 text-2xl">🏆</div>
+                <div className="absolute bottom-28 right-[18%] text-yellow-200 opacity-60 text-2xl">👏</div>
+                
+                {/* Decorative circles */}
+                <div className="absolute top-10 right-20 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-16 left-16 w-32 h-32 bg-orange-400/20 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-yellow-300/10 rounded-full blur-xl"></div>
                 
                 <div className="relative flex justify-center items-end gap-2 md:gap-12">
                   {podium.map((emp) => {
