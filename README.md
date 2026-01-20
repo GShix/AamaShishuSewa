@@ -292,10 +292,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Aama Shishu Sewa Team**
 
-📍 Lazimpat, Kathmandu, Nepal  
+📍 New Baneshwor, Kathmandu, Nepal  
 📞 +977 9764651355  
-📧 info@aamashishu.com  
-🌐 www.aamashishu.com  
+📧 info@aamasisusewa.com  
+🌐 www.aamashishudewa.vercel.app  
 
 ---
 
