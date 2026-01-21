@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Menu, X, Heart } from 'lucide-react';
+import { Globe, Menu, X, Heart, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Header = ({ language, setLanguage, t }) => {
@@ -62,11 +62,12 @@ const Header = ({ language, setLanguage, t }) => {
           </button>
         </div>
 
-        {/* Mobile Toggle Section */}
-        <div className="md:hidden flex items-center gap-3">
+        {/* Mobile Section - Simplified (Bottom Nav handles main navigation) */}
+        <div className="md:hidden flex items-center gap-2">
+          {/* Language Toggle for Mobile */}
           <div className="relative">
-            <button onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} className="p-2 rounded-lg text-slate-600 cursor-pointer">
-              <Globe className="w-5 h-5 hover:text-rose-300" />
+            <button onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} className="p-2 rounded-lg text-slate-600 cursor-pointer hover:bg-rose-50 transition">
+              <Globe className="w-5 h-5 hover:text-rose-500" />
             </button>
             {isLangDropdownOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-white border border-rose-100 rounded-xl shadow-xl z-50 py-2">
@@ -76,26 +77,28 @@ const Header = ({ language, setLanguage, t }) => {
             )}
           </div>
 
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-rose-600">
-            {isMenuOpen ? <X size={28} className='cursor-pointer'/> : <Menu size={28} className='cursor-pointer'/>}
-          </button>
+          {/* Login/Profile Button */}
+          {!isAuthenticated ? (
+            <button 
+              onClick={() => navigate('/user/login')} 
+              className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition shadow-md cursor-pointer"
+            >
+              <UserCircle className="w-4 h-4" />
+              {language === 'ne' ? 'लगइन' : 'Login'}
+            </button>
+          ) : (
+            <button 
+              onClick={() => navigate('/user/dashboard')} 
+              className="w-9 h-9 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer hover:shadow-lg transition"
+              title="Dashboard"
+            >
+              {isAuthenticated?.user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'hidden'}`}>
-        <div className="flex flex-col p-6 space-y-2 bg-rose-50">
-          {filteredNav?.map((item, i) => (
-            <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="text-left py-4 text-lg font-bold text-slate-700 hover:text-rose-400 border-b border-slate-100 cursor-pointer">
-              {item.name}
-            </button>
-          ))}
-          <button onClick={() => { navigate('/book'); setIsMenuOpen(false); }} className="mt-4 w-full py-4 bg-rose-500 text-white rounded-xl font-black shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-            <Heart className="w-5 h-5 fill-white" /> 
-            {t.hero?.ctaBook || (language === 'ne' ? 'सेवा लिनुहोस्' : 'Book Now')}
-          </button>
-        </div>
-      </div>
+      {/* Mobile Menu Overlay - Removed (using bottom nav instead) */}
     </nav>
   );
 };

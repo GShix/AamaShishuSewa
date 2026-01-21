@@ -8,86 +8,53 @@ const MobileBottomNav = ({ t, language }) => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
-  // Define navigation items based on authentication status
-  const navItems = isAuthenticated 
-    ? [
-        { 
-          id: 'home',
-          icon: Home, 
-          label: language === 'ne' ? 'होम' : 'Home', 
-          path: '/',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-        { 
-          id: 'services',
-          icon: Briefcase, 
-          label: language === 'ne' ? 'सेवा' : 'Services', 
-          path: '/services',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-        { 
-          id: 'book',
-          icon: Calendar, 
-          label: language === 'ne' ? 'बुक' : 'Book', 
-          path: '/book',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400',
-          highlighted: true // This will be the main CTA
-        },
-        { 
-          id: 'dashboard',
-          icon: UserCircle, 
-          label: language === 'ne' ? 'प्रोफाइल' : 'Profile', 
-          path: '/user/dashboard',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-      ]
-    : [
-        { 
-          id: 'home',
-          icon: Home, 
-          label: language === 'ne' ? 'होम' : 'Home', 
-          path: '/',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-        { 
-          id: 'services',
-          icon: Briefcase, 
-          label: language === 'ne' ? 'सेवा' : 'Services', 
-          path: '/services',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-        { 
-          id: 'book',
-          icon: Calendar, 
-          label: language === 'ne' ? 'बुक' : 'Book', 
-          path: '/book',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400',
-          highlighted: true
-        },
-        { 
-          id: 'about',
-          icon: Info, 
-          label: language === 'ne' ? 'बारे' : 'About', 
-          path: '/about',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-        { 
-          id: 'contact',
-          icon: Phone, 
-          label: language === 'ne' ? 'सम्पर्क' : 'Contact', 
-          path: '/contact',
-          activeColor: 'text-rose-600',
-          inactiveColor: 'text-slate-400'
-        },
-      ];
+  // Define navigation items - Always show login/profile for better UX
+  const navItems = [
+    { 
+      id: 'home',
+      icon: Home, 
+      label: language === 'ne' ? 'होम' : 'Home', 
+      path: '/',
+      activeColor: 'text-rose-600',
+      inactiveColor: 'text-slate-400'
+    },
+    { 
+      id: 'services',
+      icon: Briefcase, 
+      label: language === 'ne' ? 'सेवा' : 'Services', 
+      path: '/services',
+      activeColor: 'text-rose-600',
+      inactiveColor: 'text-slate-400'
+    },
+    { 
+      id: 'book',
+      icon: Calendar, 
+      label: language === 'ne' ? 'बुक' : 'Book', 
+      path: '/book',
+      activeColor: 'text-rose-600',
+      inactiveColor: 'text-slate-400',
+      highlighted: true // Main CTA
+    },
+    { 
+      id: 'contact',
+      icon: Phone, 
+      label: language === 'ne' ? 'सम्पर्क' : 'Contact', 
+      path: '/contact',
+      activeColor: 'text-rose-600',
+      inactiveColor: 'text-slate-400'
+    },
+    { 
+      id: 'account',
+      icon: UserCircle, 
+      label: isAuthenticated 
+        ? (language === 'ne' ? 'प्रोफाइल' : 'Profile')
+        : (language === 'ne' ? 'लगइन' : 'Login'),
+      path: isAuthenticated ? '/user/dashboard' : '/user/login',
+      activeColor: 'text-rose-600',
+      inactiveColor: 'text-slate-400',
+      isAuthButton: true // Special styling for login/profile
+    },
+  ];
 
   const isActive = (path) => {
     if (path === '/') {
