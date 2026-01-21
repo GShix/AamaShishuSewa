@@ -95,10 +95,10 @@ const AccountSettings = ({ adminUser }) => {
             <h3 className="text-2xl font-bold">{adminUser?.fullName}</h3>
             <p className="text-indigo-100">{adminUser?.email}</p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm font-medium capitalize">
+              <span className="px-3 py-1 bg-white bg-opacity-20 text-rose-500 rounded-full text-sm font-medium capitalize">
                 {adminUser?.role}
               </span>
-              <span className="px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-white bg-opacity-20 text-green-500 rounded-full text-sm font-medium">
                 {adminUser?.status}
               </span>
             </div>

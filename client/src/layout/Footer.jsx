@@ -12,7 +12,7 @@ const Footer = ({ t, language }) => {
   if (!t) return <footer className="bg-slate-900 h-20"></footer>;
 
   return (
-    <footer className="bg-slate-900 text-white py-10 md:pt-16 px-6 lg:px-10">
+    <footer className="bg-slate-900 text-white py-10 md:pt-16 px-6 lg:px-10 pb-24 md:pb-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
         
         {/* Brand Section */}

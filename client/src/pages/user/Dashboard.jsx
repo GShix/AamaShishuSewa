@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { bookingAPI, adminAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
+import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
 import { 
   Calendar, 
   Clock, 
@@ -728,7 +729,7 @@ const Dashboard = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto pb-24 lg:pb-8">
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <Loader className="w-12 h-12 text-rose-500 animate-spin" />
@@ -738,8 +739,8 @@ const Dashboard = () => {
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 py-3 lg:py-4 px-4 lg:px-8">
+        {/* Footer - Hide on mobile, show on desktop */}
+        <footer className="hidden lg:block bg-white border-t border-gray-200 py-3 lg:py-4 px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs lg:text-sm text-gray-500">
             <p className="text-center sm:text-left">© 2026 {language === 'ne' ? 'आमा शिशु सेवा' : 'Aama Shishu Sewa'}. {language === 'ne' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</p>
             <div className="flex items-center gap-3 lg:gap-4">
@@ -748,6 +749,12 @@ const Dashboard = () => {
             </div>
           </div>
         </footer>
+
+        {/* Mobile Bottom Navigation */}
+        <UserMobileBottomNav 
+          t={{ nav: menuItems }} 
+          language={language} 
+        />
       </div>
     </div>
   );

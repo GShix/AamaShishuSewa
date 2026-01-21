@@ -4,7 +4,7 @@ import { Search, Plus, Edit, Trash2, RefreshCw, X } from 'lucide-react';
 import axios from 'axios';
 
 const EmployeesManagement = () => {
-  const [professionals, setProfessionals] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -34,11 +34,11 @@ const EmployeesManagement = () => {
       const response = await axios.get(`/api/admin/employees${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Handle both 'employees' and 'professionals' response keys for backward compatibility
-      setProfessionals(response.data.employees || response.data.professionals || []);
+      // Handle both 'employees' and 'employees' response keys for backward compatibility
+      setEmployees(response.data.employees || response.data.employees || []);
     } catch (error) {
-      console.error('Error fetching professionals:', error);
-      alert('Failed to fetch professionals. Please check if the server is running.');
+      console.error('Error fetching employees:', error);
+      alert('Failed to fetch employees. Please check if the server is running.');
     } finally {
       setLoading(false);
     }
@@ -51,14 +51,14 @@ const EmployeesManagement = () => {
       
       if (editingId) {
         await axios.put(
-          `/api/admin/professionals/${editingId}`,
+          `/api/admin/employees/${editingId}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         alert('Professional updated successfully');
       } else {
         await axios.post(
-          '/api/admin/professionals',
+          '/api/admin/employees',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -70,41 +70,41 @@ const EmployeesManagement = () => {
       resetForm();
       fetchProfessionals();
     } catch (error) {
-      console.error('Error saving professional:', error);
-      alert(error.response?.data?.error || 'Failed to save professional');
+      console.error('Error saving employee:', error);
+      alert(error.response?.data?.error || 'Failed to save employee');
     }
   };
 
-  const handleEdit = (professional) => {
+  const handleEdit = (employee) => {
     setFormData({
-      fullName: professional.full_name,
-      email: professional.email,
-      phone: professional.phone,
-      specialization: professional.specialization,
-      experience: professional.experience,
-      qualification: professional.qualification,
-      license_number: professional.license_number,
-      address: professional.address,
-      bio: professional.bio,
-      hourly_rate: professional.hourly_rate
+      fullName: employee.full_name,
+      email: employee.email,
+      phone: employee.phone,
+      specialization: employee.specialization,
+      experience: employee.experience,
+      qualification: employee.qualification,
+      license_number: employee.license_number,
+      address: employee.address,
+      bio: employee.bio,
+      hourly_rate: employee.hourly_rate
     });
-    setEditingId(professional.id);
+    setEditingId(employee.id);
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this professional?')) return;
+    if (!confirm('Are you sure you want to delete this employee?')) return;
     
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`/api/admin/professionals/${id}`, {
+      await axios.delete(`/api/admin/employees/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Professional deleted successfully');
       fetchProfessionals();
     } catch (error) {
-      console.error('Error deleting professional:', error);
-      alert('Failed to delete professional');
+      console.error('Error deleting employee:', error);
+      alert('Failed to delete employee');
     }
   };
 
@@ -166,7 +166,7 @@ const EmployeesManagement = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
           </div>
         ) : (
-          professionals.map((prof) => (
+          employees.map((prof) => (
             <div key={prof.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div>
