@@ -1,9 +1,9 @@
 // client/src/pages/Register.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Heart, UserPlus, Mail, Phone, Lock, User, MapPin, AlertCircle, Loader, CheckCircle, ArrowLeft, Shield, Baby, Users, Sparkles, Briefcase } from 'lucide-react';
-import useDocumentTitle from '../hooks/useDocumentTitle';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -230,7 +230,7 @@ const Register = () => {
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center space-x-3 group">
             <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl group-hover:scale-110 transition-transform">
-              <img className='h-8 w-8 object-contain' src="/assets/logo.png" alt="Logo" />
+              <img className='h-8 w-8 object-contain' src="/logo.png" alt="Logo" />
             </div>
             <span className="text-white text-2xl font-bold">आमा शिशु सेवा</span>
           </Link>
@@ -578,6 +578,19 @@ const Register = () => {
               {t.hasAccount}{' '}
               <Link to="/login" className="font-semibold text-red-500 hover:text-red-600 transition">
                 {t.login}
+              </Link>
+            </p>
+          </div>
+
+          {/* Admin Login Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              <Link
+                to="/admin/login"
+                className="text-slate-600 hover:text-rose-500 font-medium"
+              >
+                
+              Already have an admin account?
               </Link>
             </p>
           </div>

@@ -123,6 +123,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Update user state directly (for use after successful API updates)
+  const updateUser = (updatedUserData) => {
+    const updatedUser = { ...user, ...updatedUserData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   // Check if user is authenticated
   const isAuthenticated = !!token && !!user;
 
@@ -138,6 +145,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateProfile,
+    updateUser,
     isAuthenticated,
     isAdmin,
     setError

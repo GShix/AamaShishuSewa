@@ -3,9 +3,11 @@ export const TRANSLATIONS = {
     nav: [
       { name: 'गृहपृष्ठ', path: '/' },
       { name: 'सेवाहरू', path: '/services' },
-      { name: 'नेतृत्व फलक', path: '/leaderboard' },
+      // { name: 'नेतृत्व फलक', path: '/leaderboard' },
       { name: 'सम्पर्क', path: '/contact' },
       { name: 'क्यारियर्स', path: '/careers' },
+      { name: 'लगइन', path: '/login', type: 'auth' },
+      // {name: 'रजिस्टर', path: '/register', type: 'auth'},
       { name: 'ड्यासबोर्ड', path: '/dashboard', type: 'private' }
     ],
     footer: {
@@ -158,9 +160,11 @@ export const TRANSLATIONS = {
     nav: [
       { name: 'Home', path: '/' },
       { name: 'Services', path: '/services' },
-      { name: 'Leaderboard', path: '/leaderboard' },
+      // { name: 'Leaderboard', path: '/leaderboard' },
       { name: 'Contact', path: '/contact' },
       { name: 'Careers', path: '/careers' },
+      { name: 'Login', path: '/login', type: 'auth' },
+      // {name: 'Register', path: '/register', type: 'auth'},
       { name: 'Dashboard', path: '/dashboard', type: 'private' }
     ],
     footer: {

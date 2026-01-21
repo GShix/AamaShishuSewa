@@ -25,8 +25,8 @@ const Header = ({ language, setLanguage, t }) => {
         
         {/* Logo Section */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-rose-100 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200 group-hover:rotate-6 transition-all duration-300">
-            <img className='h-6 w-6 md:h-8 md:w-8 object-contain' src="/logo.png" alt="Logo" />
+          <div className="w-11 h-11 md:w-12 md:h-12 bg-rose-100 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200 group-hover:rotate-6 transition-all duration-300">
+            <img className='h-8 w-8 md:h-10 md:w-10 object-contain' src="/logo.png" alt="Logo" />
           </div>
           <div>
             <h1 className="text-lg md:text-xl font-bold tracking-tight text-rose-600 leading-none">

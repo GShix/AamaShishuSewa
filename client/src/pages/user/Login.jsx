@@ -1,9 +1,9 @@
 // client/src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Heart, LogIn, Mail, Lock, AlertCircle, Loader, ArrowLeft, Shield, Users, Baby, Sparkles } from 'lucide-react';
-import useDocumentTitle from '../hooks/useDocumentTitle';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const Login = () => {
   useDocumentTitle('Login - आमा शिशु सेवा');
@@ -118,7 +118,7 @@ const Login = () => {
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center space-x-3 group">
             <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl group-hover:scale-110 transition-transform">
-              <img className='h-8 w-8 object-contain' src="/assets/logo.png" alt="Logo" />
+              <img className='h-8 w-8 object-contain' src="/logo.png" alt="Logo" />
             </div>
             <span className="text-white text-2xl font-bold">आमा शिशु सेवा</span>
           </Link>
