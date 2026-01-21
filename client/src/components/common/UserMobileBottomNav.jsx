@@ -14,15 +14,15 @@ const UserMobileBottomNav = ({ t, language }) => {
       id: 'dashboard',
       icon: Home, 
       label: language === 'ne' ? 'होम' : 'Home', 
-      path: '/user/dashboard',
+      path: '/dashboard',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
     { 
-      id: 'bookings',
-      icon: Calendar, 
-      label: language === 'ne' ? 'बुकिङ' : 'Bookings', 
-      path: '/user/bookings',
+      id: 'services',
+      icon: Briefcase, 
+      label: language === 'ne' ? 'सेवा' : 'Services', 
+      path: '/services',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
@@ -36,26 +36,29 @@ const UserMobileBottomNav = ({ t, language }) => {
       highlighted: true // This will be the main CTA
     },
     { 
-      id: 'employees',
+      id: 'leaderboard',
       icon: Users, 
       label: language === 'ne' ? 'कर्मचारी' : 'Staff', 
-      path: '/user/employees',
+      path: '/leaderboard',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
     { 
-      id: 'profile',
-      icon: UserCircle, 
-      label: language === 'ne' ? 'प्रोफाइल' : 'Profile', 
-      path: '/user/profile',
+      id: 'contact',
+      icon: Phone, 
+      label: language === 'ne' ? 'सम्पर्क' : 'Contact', 
+      path: '/contact',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
   ];
 
   const isActive = (path) => {
-    if (path === '/user/dashboard') {
-      return location.pathname === '/user/dashboard' || location.pathname === '/user';
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard';
+    }
+    if (path === '/') {
+      return location.pathname === '/';
     }
     return location.pathname.startsWith(path);
   };

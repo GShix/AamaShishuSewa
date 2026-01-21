@@ -49,7 +49,7 @@ const MobileBottomNav = ({ t, language }) => {
       label: isAuthenticated 
         ? (language === 'ne' ? 'प्रोफाइल' : 'Profile')
         : (language === 'ne' ? 'लगइन' : 'Login'),
-      path: isAuthenticated ? '/user/dashboard' : '/user/login',
+      path: isAuthenticated ? '/dashboard' : '/login',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400',
       isAuthButton: true // Special styling for login/profile

@@ -80,7 +80,7 @@ const Header = ({ language, setLanguage, t }) => {
           {/* Login/Profile Button */}
           {!isAuthenticated ? (
             <button 
-              onClick={() => navigate('/user/login')} 
+              onClick={() => navigate('/login')} 
               className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition shadow-md cursor-pointer"
             >
               <UserCircle className="w-4 h-4" />
@@ -88,7 +88,7 @@ const Header = ({ language, setLanguage, t }) => {
             </button>
           ) : (
             <button 
-              onClick={() => navigate('/user/dashboard')} 
+              onClick={() => navigate('/dashboard')} 
               className="w-9 h-9 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer hover:shadow-lg transition"
               title="Dashboard"
             >
