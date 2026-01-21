@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Heart, LogIn, Phone, Lock, AlertCircle, Loader } from 'lucide-react';
+import { Heart, LogIn, Mail, Lock, AlertCircle, Loader, ArrowLeft, Shield, Users, Baby, Sparkles } from 'lucide-react';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Login = () => {
@@ -20,9 +20,9 @@ const Login = () => {
 
   const translations = {
     ne: {
-      title: 'लग इन गर्नुहोस्',
-      subtitle: 'आफ्नो खातामा पहुँच गर्नुहोस्',
-      email: 'इमेल',
+      title: 'स्वागत छ फिर्ता',
+      subtitle: 'आफ्नो यात्रा जारी राख्नुहोस्',
+      email: 'इमेल ठेगाना',
       password: 'पासवर्ड',
       showPassword: 'पासवर्ड देखाउनुहोस्',
       loginButton: 'लग इन गर्नुहोस्',
@@ -30,25 +30,37 @@ const Login = () => {
       register: 'दर्ता गर्नुहोस्',
       forgotPassword: 'पासवर्ड बिर्सनुभयो?',
       loggingIn: 'लग इन गर्दै...',
+      heroTitle: 'आमा र शिशुको',
+      heroTitle2: 'हेरचाहमा विश्वास',
+      heroSubtitle: 'पेशेवर स्वास्थ्य सेवा प्रदायकहरूसँग जोडिनुहोस्',
+      feature1: 'प्रमाणित पेशेवरहरू',
+      feature2: '२४/७ समर्थन',
+      feature3: 'सुरक्षित प्लेटफर्म',
       errors: {
         required: 'कृपया सबै फिल्डहरू भर्नुहोस्',
-        invalid: 'अवैध इमेल वा फोन नम्बर'
+        invalid: 'अवैध इमेल ठेगाना'
       }
     },
     en: {
-      title: 'Login',
-      subtitle: 'Access your account',
-      email: 'Email',
+      title: 'Welcome Back',
+      subtitle: 'Continue your journey with us',
+      email: 'Email Address',
       password: 'Password',
       showPassword: 'Show password',
-      loginButton: 'Login',
+      loginButton: 'Sign In',
       noAccount: 'Don\'t have an account?',
-      register: 'Register',
+      register: 'Create Account',
       forgotPassword: 'Forgot password?',
-      loggingIn: 'Logging in...',
+      loggingIn: 'Signing in...',
+      heroTitle: 'Trusted Care for',
+      heroTitle2: 'Mothers & Infants',
+      heroSubtitle: 'Connect with certified healthcare professionals',
+      feature1: 'Verified Professionals',
+      feature2: '24/7 Support',
+      feature3: 'Secure Platform',
       errors: {
         required: 'Please fill all fields',
-        invalid: 'Invalid email'
+        invalid: 'Invalid email address'
       }
     }
   };
@@ -70,7 +82,6 @@ const Login = () => {
     }
 
     const isEmail = formData.email.includes('@');
-    const isPhone = /^[0-9]{10}$/.test(formData.email);
 
     if (!isEmail) {
       setLocalError(t.errors.invalid);
@@ -97,85 +108,154 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-green-50 flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <div className="bg-gradient-to-br from-red-200 to-orange-400 p-4 rounded-full shadow-lg">
-              {/* <Heart className="w-12 h-12 text-white" /> */}
-              <img className='h-6 w-6 md:h-8 md:w-8 object-contain' src="/assets/logo.png" alt="Logo" />
+    <div className="min-h-screen bg-white flex">
+      {/* Left Side - Branding & Trust Building */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-red-500 via-red-400 to-orange-500 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-300/20 rounded-full blur-3xl -ml-40 -mb-40"></div>
+        
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center space-x-3 group">
+            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl group-hover:scale-110 transition-transform">
+              <img className='h-8 w-8 object-contain' src="/assets/logo.png" alt="Logo" />
             </div>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-2">
-            आमा शिशु सेवा
-          </h1>
-          <p className="text-gray-600 text-sm">{t.subtitle}</p>
-          <button
-            onClick={() => setLanguage(language === 'ne' ? 'en' : 'ne')}
-            className="mt-2 text-sm text-gray-500 cursor-pointer hover:text-red-500 transition shadow-xl shadow-red-200/50 rounded-full px-3 py-1 border border-gray-300"
-          >
-            {language === 'ne' ? 'English' : 'नेपाली'}
-          </button>
+            <span className="text-white text-2xl font-bold">आमा शिशु सेवा</span>
+          </Link>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-4 md:p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">{t.title}</h2>
+        <div className="relative z-10 space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl font-bold text-white leading-tight">
+              {t.heroTitle}<br />{t.heroTitle2}
+            </h1>
+            <p className="text-xl text-white/90">{t.heroSubtitle}</p>
+          </div>
 
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <Shield className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature1}</span>
+            </div>
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <Heart className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature2}</span>
+            </div>
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature3}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 text-white/70 text-sm">
+          © 2024 Aama Shishu Sewa. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4">
+              <div className="bg-gradient-to-br from-red-500 to-orange-500 p-3 rounded-2xl">
+                <img className='h-6 w-6 object-contain' src="/assets/logo.png" alt="Logo" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                आमा शिशु सेवा
+              </span>
+            </Link>
+          </div>
+
+          {/* Language Toggle */}
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={() => setLanguage(language === 'ne' ? 'en' : 'ne')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              {language === 'ne' ? 'English' : 'नेपाली'}
+            </button>
+          </div>
+
+          {/* Form Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h2>
+            <p className="text-gray-600">{t.subtitle}</p>
+          </div>
+
+          {/* Error Alert */}
           {(localError || authError) && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-2">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-700">{localError || authError}</p>
             </div>
           )}
 
-          <div className="space-y-4">
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t.email}
               </label>
               <div className="relative">
-                <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="text"
+                  type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="example@email.com or 9801234567"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-400 focus:outline-none transition"
+                  placeholder="example@email.com"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t.password}
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-400 focus:outline-none transition"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition"
                 />
               </div>
-              <label className="flex items-center mt-2 text-sm text-gray-600">
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showPassword}
                   onChange={() => setShowPassword(!showPassword)}
-                  className="mr-2"
+                  className="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
                 />
-                {t.showPassword}
+                <span className="ml-2 text-sm text-gray-600">{t.showPassword}</span>
               </label>
+              <Link
+                to="/forgot_password"
+                className="text-sm font-medium text-red-500 hover:text-red-600 transition"
+              >
+                {t.forgotPassword}
+              </Link>
             </div>
 
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-red-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>
@@ -189,37 +269,31 @@ const Login = () => {
                 </>
               )}
             </button>
+          </form>
 
-            <div className="text-center">
+          {/* Register Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {t.noAccount}{' '}
               <Link
-                to="/forgot_password"
-                className="text-sm text-gray-600 hover:text-red-500 transition"
+                to="/register"
+                className="font-semibold text-red-500 hover:text-red-600 transition"
               >
-                {t.forgotPassword}
+                {t.register}
               </Link>
-            </div>
-
-            <div className="text-center pt-2 border-t border-gray-200">
-              <p className="text-gray-600">
-                {t.noAccount}{' '}
-                <Link
-                  to="/register"
-                  className="font-semibold text-red-500 hover:text-red-600 transition"
-                >
-                  {t.register}
-                </Link>
-              </p>
-            </div>
+            </p>
           </div>
-        </div>
 
-        <div className="text-center mt-4">
-          <Link
-            to="/"
-            className="text-gray-600 hover:text-red-500 transition text-sm"
-          >
-            ← {language === 'ne' ? 'गृहपृष्ठमा फर्कनुहोस्' : 'Back to Home'}
-          </Link>
+          {/* Back to Home - Mobile */}
+          <div className="mt-8 text-center lg:hidden">
+            <Link
+              to="/"
+              className="inline-flex items-center text-sm text-gray-600 hover:text-red-500 transition"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              {language === 'ne' ? 'गृहपृष्ठमा फर्कनुहोस्' : 'Back to Home'}
+            </Link>
+          </div>
         </div>
       </div>
     </div>

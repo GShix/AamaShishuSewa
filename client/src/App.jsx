@@ -18,6 +18,11 @@ import Leaderboard from './pages/Leaderboard';
 import EmployeeDetail from './pages/EmployeeDetail';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 
+// PWA Components
+import InstallPrompt from './components/common/InstallPrompt';
+import UpdateNotification from './components/common/UpdateNotification';
+import OfflineIndicator from './components/common/OfflineIndicator';
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -103,6 +108,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
+      <InstallPrompt />
+      <UpdateNotification />
+      <OfflineIndicator />
       <AppContent />
     </AuthProvider>
   );

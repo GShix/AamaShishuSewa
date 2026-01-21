@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Heart, UserPlus, Mail, Phone, Lock, User, MapPin, AlertCircle, Loader, CheckCircle } from 'lucide-react';
+import { Heart, UserPlus, Mail, Phone, Lock, User, MapPin, AlertCircle, Loader, CheckCircle, ArrowLeft, Shield, Baby, Users, Sparkles, Briefcase } from 'lucide-react';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Register = () => {
@@ -13,6 +13,7 @@ const Register = () => {
   useDocumentTitle('Register - आमा शिशु सेवा');
 
   const [formData, setFormData] = useState({
+    role: '', // 'parent' or 'caregiver'
     fullName: '',
     email: '',
     phone: '',
@@ -28,11 +29,17 @@ const Register = () => {
 
   const translations = {
     ne: {
-      title: 'नयाँ खाता खोल्नुहोस्',
-      subtitle: 'आमा शिशु सेवामा स्वागत छ',
-      step1: 'व्यक्तिगत जानकारी',
-      step2: 'सम्पर्क विवरण',
-      step3: 'पासवर्ड सेट गर्नुहोस्',
+      title: 'आफ्नो खाता सिर्जना गर्नुहोस्',
+      subtitle: 'आमा शिशु सेवामा सामेल हुनुहोस्',
+      step1: 'भूमिका चयन गर्नुहोस्',
+      step2: 'व्यक्तिगत जानकारी',
+      step3: 'सम्पर्क विवरण',
+      step4: 'पासवर्ड सेट गर्नुहोस्',
+      roleTitle: 'तपाईं कसरी सामेल हुन चाहनुहुन्छ?',
+      parentRole: 'अभिभावकको रूपमा',
+      parentDesc: 'हेरचाहकर्ताहरू भेट्टाउनुहोस् र बुक गर्नुहोस्',
+      caregiverRole: 'हेरचाहकर्ताको रूपमा',
+      caregiverDesc: 'सेवाहरू प्रदान गर्नुहोस् र कमाउनुहोस्',
       fullName: 'पूरा नाम',
       email: 'इमेल ठेगाना',
       phone: 'फोन नम्बर',
@@ -42,13 +49,20 @@ const Register = () => {
       showPassword: 'पासवर्ड देखाउनुहोस्',
       next: 'अर्को',
       back: 'पछाडि',
-      registerButton: 'दर्ता गर्नुहोस्',
+      registerButton: 'खाता सिर्जना गर्नुहोस्',
       registering: 'दर्ता गर्दै...',
       hasAccount: 'पहिले नै खाता छ?',
       login: 'लग इन गर्नुहोस्',
       passwordHint: 'कम्तिमा ६ अक्षर',
       phoneHint: '९८०१२३४५६७ (१० अंक)',
+      heroTitle: 'विश्वसनीय हेरचाहमा',
+      heroTitle2: 'सामेल हुनुहोस्',
+      heroSubtitle: 'हजारौं परिवारहरूद्वारा विश्वास गरिएको',
+      feature1: 'सुरक्षित र विश्वसनीय',
+      feature2: 'प्रमाणित पेशेवरहरू',
+      feature3: '२४/७ समर्थन',
       errors: {
+        roleRequired: 'कृपया भूमिका चयन गर्नुहोस्',
         nameRequired: 'कृपया आफ्नो नाम प्रविष्ट गर्नुहोस्',
         emailRequired: 'कृपया इमेल प्रविष्ट गर्नुहोस्',
         emailInvalid: 'अवैध इमेल ठेगाना',
@@ -61,11 +75,17 @@ const Register = () => {
       }
     },
     en: {
-      title: 'Create New Account',
-      subtitle: 'Welcome to Aama Sisu Seva',
-      step1: 'Personal Information',
-      step2: 'Contact Details',
-      step3: 'Set Password',
+      title: 'Create Your Account',
+      subtitle: 'Join Aama Shishu Sewa today',
+      step1: 'Choose Role',
+      step2: 'Personal Info',
+      step3: 'Contact Details',
+      step4: 'Set Password',
+      roleTitle: 'How would you like to join?',
+      parentRole: 'As a Parent',
+      parentDesc: 'Find and book caregivers',
+      caregiverRole: 'As a Caregiver',
+      caregiverDesc: 'Provide services and earn',
       fullName: 'Full Name',
       email: 'Email Address',
       phone: 'Phone Number',
@@ -73,15 +93,22 @@ const Register = () => {
       confirmPassword: 'Confirm Password',
       address: 'Address',
       showPassword: 'Show password',
-      next: 'Next',
+      next: 'Continue',
       back: 'Back',
-      registerButton: 'Register',
-      registering: 'Registering...',
+      registerButton: 'Create Account',
+      registering: 'Creating account...',
       hasAccount: 'Already have an account?',
-      login: 'Login',
+      login: 'Sign In',
       passwordHint: 'At least 6 characters',
       phoneHint: '9801234567 (10 digits)',
+      heroTitle: 'Join Trusted Care',
+      heroTitle2: 'Community',
+      heroSubtitle: 'Trusted by thousands of families',
+      feature1: 'Secure & Reliable',
+      feature2: 'Verified Professionals',
+      feature3: '24/7 Support',
       errors: {
+        roleRequired: 'Please select a role',
         nameRequired: 'Please enter your name',
         emailRequired: 'Please enter your email',
         emailInvalid: 'Invalid email address',
@@ -113,6 +140,15 @@ const Register = () => {
 
   const validateStep1 = () => {
     const newErrors = {};
+    if (!formData.role) {
+      newErrors.role = t.errors.roleRequired;
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const newErrors = {};
     if (!formData.fullName.trim()) {
       newErrors.fullName = t.errors.nameRequired;
     }
@@ -125,7 +161,7 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateStep2 = () => {
+  const validateStep3 = () => {
     const newErrors = {};
     if (!formData.phone.trim()) {
       newErrors.phone = t.errors.phoneRequired;
@@ -139,7 +175,7 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateStep3 = () => {
+  const validateStep4 = () => {
     const newErrors = {};
     if (!formData.password) {
       newErrors.password = t.errors.passwordRequired;
@@ -158,12 +194,14 @@ const Register = () => {
       setCurrentStep(2);
     } else if (currentStep === 2 && validateStep2()) {
       setCurrentStep(3);
+    } else if (currentStep === 3 && validateStep3()) {
+      setCurrentStep(4);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateStep3()) return;
+    if (!validateStep4()) return;
 
     const result = await register({
       fullName: formData.fullName,
@@ -172,7 +210,8 @@ const Register = () => {
       password: formData.password,
       address: formData.address,
       latitude: formData.latitude,
-      longitude: formData.longitude
+      longitude: formData.longitude,
+      role: formData.role
     });
 
     if (result.success) {
@@ -181,42 +220,101 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-green-50 flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-2">
-            <div className="bg-gradient-to-br from-red-200 to-orange-400 p-4 rounded-full shadow-lg">
-              {/* <Heart className="w-12 h-12 text-white" /> */}
-              <img className='h-6 w-6 md:h-8 md:w-8 object-contain' src="/assets/logo.png" alt="Logo" />
+    <div className="min-h-screen bg-white flex">
+      {/* Left Side - Branding & Trust Building */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-500 via-red-500 to-red-600 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-red-400/20 rounded-full blur-3xl -ml-40 -mb-40"></div>
+        
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center space-x-3 group">
+            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl group-hover:scale-110 transition-transform">
+              <img className='h-8 w-8 object-contain' src="/assets/logo.png" alt="Logo" />
             </div>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent mb-2">
-            आमा शिशु सेवा
-          </h1>
-          <p className="text-gray-600">{t.subtitle}</p>
-          <button
-            onClick={() => setLanguage(language === 'ne' ? 'en' : 'ne')}
-            className="mt-4 text-sm text-gray-500 hover:text-red-500 transition shadow-xl shadow-red-200/50 rounded-full px-3 py-1 border border-gray-300"
-          >
-            {language === 'ne' ? 'English' : 'नेपाली'}
-          </button>
+            <span className="text-white text-2xl font-bold">आमा शिशु सेवा</span>
+          </Link>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-4 md:p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">{t.title}</h2>
+        <div className="relative z-10 space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl font-bold text-white leading-tight">
+              {t.heroTitle}<br />{t.heroTitle2}
+            </h1>
+            <p className="text-xl text-white/90">{t.heroSubtitle}</p>
+          </div>
 
-          <div className="flex justify-between mb-6">
-            {[1, 2, 3].map((step) => (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <Shield className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature1}</span>
+            </div>
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature2}</span>
+            </div>
+            <div className="flex items-center space-x-3 text-white">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <span className="text-lg">{t.feature3}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 text-white/70 text-sm">
+          © 2024 Aama Shishu Sewa. All rights reserved.
+        </div>
+      </div>
+
+      {/* Right Side - Registration Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 overflow-y-auto">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4">
+              <div className="bg-gradient-to-br from-red-500 to-orange-500 p-3 rounded-2xl">
+                <img className='h-6 w-6 object-contain' src="/assets/logo.png" alt="Logo" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                आमा शिशु सेवा
+              </span>
+            </Link>
+          </div>
+
+          {/* Language Toggle */}
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={() => setLanguage(language === 'ne' ? 'en' : 'ne')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              {language === 'ne' ? 'English' : 'नेपाली'}
+            </button>
+          </div>
+
+          {/* Form Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h2>
+            <p className="text-gray-600">{t.subtitle}</p>
+          </div>
+
+          {/* Progress Steps */}
+          <div className="flex justify-between mb-8">
+            {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition ${
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
                   currentStep >= step
-                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
                     : 'bg-gray-200 text-gray-500'
                 }`}>
-                  {currentStep > step ? <CheckCircle className="w-6 h-6" /> : step}
+                  {currentStep > step ? <CheckCircle className="w-5 h-5" /> : step}
                 </div>
-                {step < 3 && (
-                  <div className={`flex-1 h-1 mx-2 transition ${
+                {step < 4 && (
+                  <div className={`flex-1 h-0.5 mx-2 transition-all ${
                     currentStep > step ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-gray-200'
                   }`} />
                 )}
@@ -224,9 +322,10 @@ const Register = () => {
             ))}
           </div>
 
+          {/* Error Alert */}
           {Object.keys(errors).length > 0 && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <div className="flex items-start space-x-2">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   {Object.values(errors).map((error, idx) => (
@@ -237,150 +336,225 @@ const Register = () => {
             </div>
           )}
 
-          <div className="space-y-4">
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Step 1: Role Selection */}
             {currentStep === 1 && (
-              <>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.roleTitle}</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({...formData, role: 'parent'});
+                      if (errors.role) setErrors({...errors, role: ''});
+                    }}
+                    className={`p-6 border-2 rounded-xl text-left transition-all ${
+                      formData.role === 'parent'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 rounded-lg ${
+                        formData.role === 'parent' ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        <Baby className={`w-6 h-6 ${
+                          formData.role === 'parent' ? 'text-red-600' : 'text-gray-600'
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">{t.parentRole}</h4>
+                        <p className="text-sm text-gray-600">{t.parentDesc}</p>
+                      </div>
+                      {formData.role === 'parent' && (
+                        <CheckCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({...formData, role: 'caregiver'});
+                      if (errors.role) setErrors({...errors, role: ''});
+                    }}
+                    className={`p-6 border-2 rounded-xl text-left transition-all ${
+                      formData.role === 'caregiver'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 rounded-lg ${
+                        formData.role === 'caregiver' ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        <Briefcase className={`w-6 h-6 ${
+                          formData.role === 'caregiver' ? 'text-red-600' : 'text-gray-600'
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">{t.caregiverRole}</h4>
+                        <p className="text-sm text-gray-600">{t.caregiverDesc}</p>
+                      </div>
+                      {formData.role === 'caregiver' && (
+                        <CheckCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Personal Information */}
+            {currentStep === 2 && (
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.fullName}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.fullName}</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
                       placeholder="राम बहादुर / Ram Bahadur"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.fullName ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.fullName ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.email}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.email}</label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="example@email.com"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.email ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.email ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
-            {currentStep === 2 && (
-              <>
+            {/* Step 3: Contact Details */}
+            {currentStep === 3 && (
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.phone}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.phone}</label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="9801234567"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.phone ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.phone ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500">{t.phoneHint}</p>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.address}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.address}</label>
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
                       placeholder="Kathmandu, Baneshwor"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.address ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.address ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
-            {currentStep === 3 && (
-              <>
+            {/* Step 4: Password */}
+            {currentStep === 4 && (
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.password}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.password}</label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.password ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.password ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500">{t.passwordHint}</p>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">{t.confirmPassword}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t.confirmPassword}</label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none transition ${
-                        errors.confirmPassword ? 'border-red-400' : 'border-gray-200 focus:border-red-400'
+                      className={`w-full pl-11 pr-4 py-3 bg-white border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition ${
+                        errors.confirmPassword ? 'border-red-400' : 'border-gray-300'
                       }`}
                     />
                   </div>
                 </div>
-                <label className="flex items-center text-sm text-gray-600">
+                <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={showPassword}
                     onChange={() => setShowPassword(!showPassword)}
-                    className="mr-2"
+                    className="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
                   />
-                  {t.showPassword}
+                  <span className="ml-2 text-sm text-gray-600">{t.showPassword}</span>
                 </label>
-              </>
+              </div>
             )}
 
-            <div className="flex space-x-4 pt-3">
+            {/* Navigation Buttons */}
+            <div className="flex space-x-4 pt-4">
               {currentStep > 1 && (
                 <button
+                  type="button"
                   onClick={() => setCurrentStep(currentStep - 1)}
-                  className="flex-1 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition cursor-pointer"
+                  className="flex-1 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
                 >
                   {t.back}
                 </button>
               )}
-              {currentStep < 3 ? (
+              {currentStep < 4 ? (
                 <button
+                  type="button"
                   onClick={handleNext}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform cursor-pointer"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-red-600 hover:to-orange-600 transition-all"
                 >
                   {t.next}
                 </button>
               ) : (
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 cursor-pointer"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-red-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   {loading ? (
                     <>
@@ -396,22 +570,25 @@ const Register = () => {
                 </button>
               )}
             </div>
+          </form>
 
-            <div className="text-center pt-4 border-t border-gray-200">
-              <p className="text-gray-600">
-                {t.hasAccount}{' '}
-                <Link to="/login" className="font-semibold text-red-500 hover:text-red-600 transition">
-                  {t.login}
-                </Link>
-              </p>
-            </div>
+          {/* Login Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {t.hasAccount}{' '}
+              <Link to="/login" className="font-semibold text-red-500 hover:text-red-600 transition">
+                {t.login}
+              </Link>
+            </p>
           </div>
-        </div>
 
-        <div className="text-center mt-4">
-          <Link to="/" className="text-gray-600 hover:text-red-500 transition text-sm">
-            ← {language === 'ne' ? 'गृहपृष्ठमा फर्कनुहोस्' : 'Back to Home'}
-          </Link>
+          {/* Back to Home - Mobile */}
+          <div className="mt-8 text-center lg:hidden">
+            <Link to="/" className="inline-flex items-center text-sm text-gray-600 hover:text-red-500 transition">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              {language === 'ne' ? 'गृहपृष्ठमा फर्कनुहोस्' : 'Back to Home'}
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -419,79 +596,4 @@ const Register = () => {
 };
 
 export default Register;
-
-      // <div className="min-h-[85vh] flex items-center justify-center px-6 py-8">
-      //   <div className="max-w-xl w-full bg-white rounded-[2.5rem] shadow-xl shadow-rose-100/50 border border-rose-50 p-8 md:p-12">
-          
-      //     <div className="text-center mb-10">
-      //       <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-      //         <UserPlus className="text-rose-500 w-8 h-8" />
-      //       </div>
-      //       <h2 className="text-3xl font-black text-slate-900">Create Account</h2>
-      //       <p className="text-slate-500 mt-2">Join our community for expert mother & infant care</p>
-      //     </div>
-
-      //     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      //       {/* Full Name */}
-      //       <div className="md:col-span-2 space-y-2">
-      //         <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-      //         <div className="relative group">
-      //           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-      //           <input 
-      //             type="text" 
-      //             required
-      //             className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-rose-200 focus:ring-4 focus:ring-rose-50 transition-all outline-none font-medium"
-      //             placeholder="Full Name"
-      //             onChange={(e) => setFormData({...formData, name: e.target.value})}
-      //           />
-      //         </div>
-      //       </div>
-
-      //       {/* Email Address */}
-      //       <div className="md:col-span-2 space-y-2">
-      //         <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
-      //         <div className="relative group">
-      //           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-      //           <input 
-      //             type="email" 
-      //             required
-      //             className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-rose-200 focus:ring-4 focus:ring-rose-50 transition-all outline-none font-medium"
-      //             placeholder="name@example.com"
-      //             onChange={(e) => setFormData({...formData, email: e.target.value})}
-      //           />
-      //         </div>
-      //       </div>
-
-      //       {/* Password */}
-      //       <div className="md:col-span-2 space-y-2">
-      //         <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
-      //         <div className="relative group">
-      //           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-      //           <input 
-      //             type="password" 
-      //             required
-      //             className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-rose-200 focus:ring-4 focus:ring-rose-50 transition-all outline-none font-medium"
-      //             placeholder="Min. 8 characters"
-      //             onChange={(e) => setFormData({...formData, password: e.target.value})}
-      //           />
-      //         </div>
-      //       </div>
-
-      //       <div className="md:col-span-2 flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-      //           <ShieldCheck className="text-green-500 w-6 h-6 mt-0.5 shrink-0" />
-      //           <p className="text-[11px] text-slate-500 leading-relaxed">
-      //               By registering, you agree to our <b>Terms of Service</b>. Your data is encrypted and handled according to our <b>Privacy Policy</b>.
-      //           </p>
-      //       </div>
-
-      //       <button type="submit" className="md:col-span-2 w-full py-4 bg-rose-500 text-white rounded-2xl font-black shadow-lg shadow-rose-200 hover:bg-rose-600 hover:-translate-y-0.5 transition-all">
-      //         Create Account
-      //       </button>
-      //     </form>
-
-      //     <p className="text-center mt-8 text-slate-500 font-medium">
-      //       Already have an account?{' '}
-      //       <Link to="/login" className="text-rose-600 font-black hover:underline">Login</Link>
-      //     </p>
-      //   </div>
-      // </div>
+ 

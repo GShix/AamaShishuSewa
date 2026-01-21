@@ -101,5 +101,3 @@ const Header = ({ language, setLanguage, t }) => {
 };
 
 export default Header;
-
-export default Header;
