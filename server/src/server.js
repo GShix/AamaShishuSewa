@@ -10,6 +10,8 @@ import adminAuthRoutes from './routes/admin/adminAuth.js';
 import adminRoutes from './routes/admin/admin.js';
 import adminJobRoutes from './routes/admin/jobs.js';
 import userJobRoutes from './routes/user/jobs.js';
+import userBookingRoutes from './routes/user/bookings.js';
+import userServiceRoutes from './routes/user/services.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -48,6 +50,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/jobs', userJobRoutes);
+app.use('/api/bookings', userBookingRoutes);
+app.use('/api/services', userServiceRoutes);
 
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);

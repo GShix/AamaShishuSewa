@@ -5,12 +5,12 @@ import { authenticate } from '../../middleware/auth.js';
 
 const router = express.Router();
 
+// Protected routes (require authentication) - MUST come before /:id
+router.get('/my-applications', authenticate, jobController.getMyApplications);
+router.post('/:id/apply', authenticate, jobController.applyForJob);
+
 // Public routes
 router.get('/', jobController.getOpenJobs);
 router.get('/:id', jobController.getJobById);
-
-// Protected routes (require authentication)
-router.post('/:id/apply', authenticate, jobController.applyForJob);
-router.get('/my/applications', authenticate, jobController.getMyApplications);
 
 export default router;

@@ -97,6 +97,11 @@ export const bookingAPI = {
   getMyBookings: () => api.get('/bookings/my-bookings'),
 };
 
+export const servicesAPI = {
+  getAll: (params) => api.get('/services', { params }),
+  getById: (id) => api.get(`/services/${id}`),
+};
+
 export const jobsAPI = {
   getOpenJobs: (params) => api.get('/jobs', { params }),
   getJobById: (id) => api.get(`/jobs/${id}`),

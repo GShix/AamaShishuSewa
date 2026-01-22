@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { bookingAPI, adminAPI, jobsAPI } from '../../utils/api';
+import { bookingAPI, servicesAPI, jobsAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
 import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
 import { 
@@ -155,8 +155,8 @@ const Dashboard = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await adminAPI.getServices();
-      setServices(response.data.services || []);
+      const response = await servicesAPI.getAll();
+      setServices(response.data || []);
     } catch (error) {
       console.error('Error fetching services:', error);
     }
@@ -192,7 +192,7 @@ const Dashboard = () => {
   const menuItems = [
     { id: 'dashboard', label: language === 'ne' ? 'ड्यासबोर्ड' : 'Dashboard', icon: LayoutDashboard },
     { id: 'bookings', label: language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings', icon: Calendar },
-    { id: 'appointments', label: language === 'ne' ? 'ग्राहक अपोइन्टमेन्टहरू' : 'Customer Appointments', icon: Clock },
+    { id: 'appointments', label: language === 'ne' ? 'ग्राहक अपोइन्टमेन्ट' : 'Customer Appointment', icon: Clock },
     { id: 'services', label: language === 'ne' ? 'सेवाहरू' : 'Services', icon: Package },
     { id: 'careers', label: language === 'ne' ? 'रोजगारी' : 'Careers', icon: Briefcase },
     { id: 'feeds', label: language === 'ne' ? 'समाचार' : 'Feeds', icon: FileText },
