@@ -30,7 +30,7 @@ const BookingsManagement = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setBookings(response.data.bookings);
+      setBookings(response.data.bookings || []);
       setPagination(prev => ({ ...prev, ...response.data.pagination }));
     } catch (error) {
       console.error('Error fetching bookings:', error);

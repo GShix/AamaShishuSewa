@@ -31,7 +31,7 @@ const UsersManagement = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setUsers(response.data.users);
+      setUsers(response.data.users || []);
       setPagination(prev => ({ ...prev, ...response.data.pagination }));
     } catch (error) {
       console.error('Error fetching users:', error);

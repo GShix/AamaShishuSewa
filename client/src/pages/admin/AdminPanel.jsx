@@ -163,10 +163,11 @@ const AdminPanel = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {recentBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
-                    <td className="px-3 lg:px-6 py-4 text-xs lg:text-sm font-medium text-gray-900 whitespace-nowrap">
-                      #{booking.booking_id || booking.id.slice(0, 8)}
+                {Array.isArray(recentBookings) && recentBookings.length > 0 ? (
+                  recentBookings.map((booking) => (
+                    <tr key={booking.id} className="hover:bg-gray-50">
+                      <td className="px-3 lg:px-6 py-4 text-xs lg:text-sm font-medium text-gray-900 whitespace-nowrap">
+                        #{booking.booking_id || booking.id.slice(0, 8)}
                     </td>
                     <td className="px-3 lg:px-6 py-4 text-xs lg:text-sm text-gray-900 whitespace-nowrap">
                       {booking.users?.full_name || 'N/A'}
@@ -191,7 +192,14 @@ const AdminPanel = () => {
                       {new Date(booking.created_at).toLocaleDateString()}
                     </td>
                   </tr>
-                ))}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                      {loading ? 'Loading bookings...' : 'No recent bookings found'}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
