@@ -45,15 +45,11 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      console.log('Attempting admin login with:', { email: formData.email });
-      
       // Use adminAuthAPI from utils/api.js which uses the correct base URL
       const response = await adminAuthAPI.login({
         email: formData.email,
         password: formData.password
       });
-
-      console.log('Login response:', response.data);
 
       const { user, token } = response.data;
 
@@ -61,15 +57,10 @@ const AdminLogin = () => {
       localStorage.setItem('adminToken', token);
       localStorage.setItem('adminUser', JSON.stringify(user));
 
-      console.log('Admin login successful! User:', user);
-      console.log('Navigating to dashboard...');
-
       // Redirect to admin dashboard
       navigate('/admin/dashboard');
     } catch (err) {
-      console.error('Admin login error:', err);
-      console.error('Error response:', err.response?.data);
-      setError(err.response?.data?.error || err.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

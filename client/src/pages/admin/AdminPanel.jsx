@@ -51,10 +51,17 @@ const AdminPanel = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setStats(response.data.stats);
-      setRecentBookings(response.data.recentBookings);
+      // Ensure stats has default values even if API returns partial data
+      setStats({
+        totalUsers: response.data.stats?.totalUsers || 0,
+        totalBookings: response.data.stats?.totalBookings || 0,
+        totalEmployees: response.data.stats?.totalEmployees || 0,
+        pendingBookings: response.data.stats?.pendingBookings || 0
+      });
+      setRecentBookings(response.data.recentBookings || []);
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      // Keep default stats on error - already initialized in useState
+      console.error('Failed to load dashboard stats');
     } finally {
       setLoading(false);
     }
