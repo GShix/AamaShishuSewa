@@ -16,8 +16,15 @@ export const authenticate = (req, res, next) => {
 };
 
 export const requireAdmin = (req, res, next) => {
-  if (req.userRole !== 'admin') {
+  if (!['admin', 'superAdmin'].includes(req.userRole)) {
     return res.status(403).json({ error: 'Admin access required' });
+  }
+  next();
+};
+
+export const requireSuperAdmin = (req, res, next) => {
+  if (req.userRole !== 'superAdmin') {
+    return res.status(403).json({ error: 'Super Admin access required' });
   }
   next();
 };

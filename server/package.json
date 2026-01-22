@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "admin:insert": "node ./scripts/insertAdmins.js",
+    "admin:validate": "node ./scripts/validateAdminSystem.js",
+    "admin:help": "echo See ADMIN_SETUP_README.md for full documentation"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +21,7 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1",
+    "express": "^4.22.1",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",

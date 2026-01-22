@@ -1,8 +1,8 @@
 // server/src/controllers/authController.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { sendOTP } from '../services/notificationService.js';
-import { supabaseAdmin } from '../config/supabase.js';
+import { sendOTP } from '../../services/notificationService.js';
+import { supabaseAdmin } from '../../config/supabase.js';
 
 // Generate JWT token
 const generateToken = (userId, role) => {
@@ -71,9 +71,8 @@ export const register = async (req, res) => {
         password_hash: passwordHash,
         full_name: fullName,
         address,
-        latitude: latitude || 27.7172,
-        longitude: longitude || 85.3240,
-        role: 'client'
+        role: 'user',
+        status: 'active'
       })
       .select()
       .single();
@@ -121,9 +120,17 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check if account is active
-    if (!user.is_active) {
-      return res.status(403).json({ error: 'Account is deactivated. Please contact support.' });
+    // Check if account is active (case-insensitive and handle null/undefined)
+    // If status is NULL or undefined, treat as active for backward compatibility
+    const userStatus = user.status?.toLowerCase() || 'active';
+    if (userStatus !== 'active') {
+      console.log('Login blocked - User status:', user.status, 'for user:', user.email);
+      const statusMessage = userStatus === 'suspended' 
+        ? 'Account has been suspended. Please contact support.'
+        : userStatus === 'inactive'
+        ? 'Account is deactivated. Please contact support.'
+        : `Account status is "${user.status}". Please contact support.`;
+      return res.status(403).json({ error: statusMessage });
     }
 
     // Verify password

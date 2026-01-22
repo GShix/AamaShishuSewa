@@ -9,7 +9,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+  console.warn('⚠️  Warning: Missing Supabase environment variables. Please check your .env file.');
+  console.warn(`SUPABASE_URL: ${supabaseUrl ? 'Set' : 'Missing'}`);
+  console.warn(`SUPABASE_SERVICE_ROLE_KEY: ${supabaseServiceKey ? 'Set' : 'Missing'}`);
 }
 
 // Admin client with service role (full access - bypass RLS)

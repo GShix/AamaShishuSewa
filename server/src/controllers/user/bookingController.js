@@ -1,7 +1,7 @@
 // server/src/controllers/bookingController.js
-import { supabaseAdmin, supabaseHelpers } from '../config/supabase.js';
-import { autoAssignProfessional } from '../services/matchingService.js';
-import { generateCarePlan, generateNotification } from '../services/carePlanService.js';
+import { supabaseAdmin, supabaseHelpers } from '../../config/supabase.js';
+import { autoAssignProfessional } from '../../services/matchingService.js';
+import { generateCarePlan, generateNotification } from '../../services/carePlanService.js';
 
 /**
  * Create a new booking with AI automation

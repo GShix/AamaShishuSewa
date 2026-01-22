@@ -9,8 +9,8 @@ import {
   verifyOTP,
   resetPassword,
   changePassword
-} from '../controllers/authController.js';
-import { authenticate } from '../middleware/auth.js';
+} from '../../controllers/user/authController.js';
+import { authenticate } from '../../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
@@ -57,6 +57,43 @@ router.post('/login', [
     .withMessage('Password is required'),
   validate
 ], login);
+
+// Debug endpoint to check user status (temporary - remove in production)
+router.post('/debug-user-status', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, email, phone, full_name, status, role, created_at')
+      .eq('email', email)
+      .single();
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({
+      user,
+      statusCheck: {
+        rawValue: user.status,
+        type: typeof user.status,
+        isNull: user.status === null,
+        isUndefined: user.status === undefined,
+        toLowerCase: user.status?.toLowerCase(),
+        equals_active: user.status === 'active',
+        equals_active_lowercase: user.status?.toLowerCase() === 'active'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.post('/forgot-password', [
   body('email')
