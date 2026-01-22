@@ -335,48 +335,72 @@ export const getAdminStats = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     // Get total users
-    const { count: totalUsers } = await supabaseAdmin
+    const { count: totalUsers, error: usersError } = await supabaseAdmin
       .from('users')
       .select('*', { count: 'exact', head: true });
 
     // Get total bookings
-    const { count: totalBookings } = await supabaseAdmin
+    const { count: totalBookings, error: bookingsError } = await supabaseAdmin
       .from('bookings')
       .select('*', { count: 'exact', head: true });
 
     // Get total employees (renamed from professionals)
-    const { count: totalProfessionals } = await supabaseAdmin
+    const { count: totalEmployees, error: employeesError } = await supabaseAdmin
       .from('employees')
       .select('*', { count: 'exact', head: true });
 
     // Get pending bookings
-    const { count: pendingBookings } = await supabaseAdmin
+    const { count: pendingBookings, error: pendingError } = await supabaseAdmin
       .from('bookings')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
 
-    // Get recent bookings
-    const { data: recentBookings } = await supabaseAdmin
+    // Get recent bookings with proper column references
+    const { data: recentBookings, error: recentError } = await supabaseAdmin
       .from('bookings')
       .select(`
         *,
-        users!bookings_user_id_fkey(full_name, email),
-        employees!bookings_professional_id_fkey(full_name)
+        users:user_id (
+          id,
+          full_name,
+          email
+        ),
+        employees:employee_id (
+          id,
+          full_name,
+          phone
+        )
       `)
       .order('created_at', { ascending: false })
       .limit(5);
+
+    // Log any errors but don't fail the request
+    if (usersError) console.error('Users count error:', usersError);
+    if (bookingsError) console.error('Bookings count error:', bookingsError);
+    if (employeesError) console.error('Employees count error:', employeesError);
+    if (pendingError) console.error('Pending bookings error:', pendingError);
+    if (recentError) console.error('Recent bookings error:', recentError);
 
     res.status(200).json({
       stats: {
         totalUsers: totalUsers || 0,
         totalBookings: totalBookings || 0,
-        totalEmployees: totalProfessionals || 0,
+        totalEmployees: totalEmployees || 0,
         pendingBookings: pendingBookings || 0
       },
       recentBookings: recentBookings || []
     });
   } catch (error) {
     console.error('Get dashboard stats error:', error);
-    res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    res.status(500).json({ 
+      error: 'Failed to fetch dashboard stats',
+      stats: {
+        totalUsers: 0,
+        totalBookings: 0,
+        totalEmployees: 0,
+        pendingBookings: 0
+      },
+      recentBookings: []
+    });
   }
 };

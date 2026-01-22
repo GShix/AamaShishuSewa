@@ -7,7 +7,7 @@ import {
   TrendingUp, Clock, CheckCircle, AlertCircle, Search,
   Filter, Edit, Trash2, Eye, Shield, Crown
 } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 // Import management components
 import BookingsManagement from '../../components/admin/BookingsManagement';
@@ -46,10 +46,7 @@ const AdminPanel = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get('/api/admin/dashboard/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getDashboardStats();
       
       // Ensure stats has default values even if API returns partial data
       setStats({
