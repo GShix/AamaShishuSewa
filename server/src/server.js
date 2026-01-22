@@ -24,8 +24,7 @@ app.use(helmet({
 app.use(cors({
   origin: [
     process.env.CLIENT_URL || 'http://localhost:5173',
-    'https://aama-shishu-sewa.vercel.app',
-    'https://aamashishusewa.vercel.app'
+    'https://aama-shishu-sewa.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
