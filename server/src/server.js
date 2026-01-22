@@ -72,13 +72,13 @@ app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/jobs', adminJobRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Error handling
-app.use(errorHandler);
-
-// 404 handler
+// 404 handler - must come BEFORE error handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
+
+// Error handling - must come LAST
+app.use(errorHandler);
 
 // Only start server if not in serverless environment
 if (process.env.VERCEL !== '1') {
