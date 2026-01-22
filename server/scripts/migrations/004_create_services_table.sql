@@ -4,13 +4,19 @@
 CREATE TABLE IF NOT EXISTS services (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
+  name_ne VARCHAR(255),
   description TEXT,
-  category VARCHAR(100) NOT NULL,
-  price DECIMAL(10, 2),
+  description_ne TEXT,
+  category VARCHAR(100),
+  base_price DECIMAL(10, 2),
+  price_unit VARCHAR(50),
   pricing_type VARCHAR(20) DEFAULT 'fixed' CHECK (pricing_type IN ('fixed', 'custom')),
   duration INTEGER DEFAULT 60,
   features JSONB DEFAULT '[]'::jsonb,
+  image_url TEXT,
+  icon VARCHAR(100),
   status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

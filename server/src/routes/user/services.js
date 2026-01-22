@@ -7,13 +7,19 @@ const router = express.Router();
 // Get all active services (public route)
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin
+    // Query for services where status='active' OR is_active=true
+    let query = supabaseAdmin
       .from('services')
       .select('*')
-      .eq('is_active', true)
       .order('created_at', { ascending: false });
+    
+    // Try both status and is_active columns for compatibility
+    const { data, error } = await query.or('status.eq.active,is_active.eq.true');
 
-    if (error) throw error;
+    if (error) {
+      console.error('Services query error:', error);
+      throw error;
+    }
 
     res.json(data || []);
   } catch (error) {

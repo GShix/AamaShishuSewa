@@ -142,7 +142,7 @@ export const getBookingById = async (bookingId) => {
         users:user_id (
           id, full_name, email, phone, address
         ),
-        professionals:professional_id (
+        professionals:employee_id (
           id, full_name, phone, email, rating, 
           specialization, experience_years, bio
         ),
@@ -224,7 +224,7 @@ export const getUserBookings = async (userId) => {
       .from('bookings')
       .select(`
         *,
-        professionals:professional_id (
+        professionals:employee_id (
           id, full_name, phone, rating, specialization
         ),
         nwaran_details (*),
@@ -255,7 +255,7 @@ export const getProfessionalBookings = async (professionalId) => {
         ),
         nwaran_details (*)
       `)
-      .eq('professional_id', professionalId)
+      .eq('employee_id', professionalId)
       .order('booking_date', { ascending: true });
     
     if (error) throw error;
@@ -276,7 +276,7 @@ export const getConflictingBookings = async (professionalId, bookingDate) => {
     const { data, error } = await supabaseAdmin
       .from('bookings')
       .select('id, booking_date, status')
-      .eq('professional_id', professionalId)
+      .eq('employee_id', professionalId)
       .eq('booking_date', dateStr)
       .in('status', ['confirmed', 'in_progress']);
     
@@ -319,7 +319,7 @@ export const assignProfessionalToBooking = async (bookingId, professionalId) => 
     const { data, error } = await supabaseAdmin
       .from('bookings')
       .update({ 
-        professional_id: professionalId,
+        employee_id: professionalId,
         status: 'confirmed',
         updated_at: new Date()
       })

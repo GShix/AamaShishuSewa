@@ -74,7 +74,7 @@ export const createBooking = async (req, res) => {
       const assignmentResult = await autoAssignProfessional(booking.id);
       
       if (assignmentResult.success) {
-        booking.professional_id = assignmentResult.professional.id;
+        booking.employee_id = assignmentResult.professional.id;
         booking.status = 'confirmed';
 
         // 2. Generate care plan
@@ -112,7 +112,7 @@ export const getUserBookings = async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        professionals:professional_id (
+        professionals:employee_id (
           id, full_name, phone, rating, specialization
         ),
         nwaran_details (*),
@@ -144,7 +144,7 @@ export const getBookingById = async (req, res) => {
       .select(`
         *,
         users:user_id (id, full_name, phone, email, address),
-        professionals:professional_id (
+        professionals:employee_id (
           id, full_name, phone, email, rating, 
           specialization, experience_years
         ),

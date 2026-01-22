@@ -213,7 +213,7 @@ export const autoAssignProfessional = async (bookingId) => {
       throw new Error('Booking not found');
     }
 
-    if (booking.professional_id) {
+    if (booking.employee_id) {
       return {
         success: false,
         message: 'Booking already has a professional assigned',
