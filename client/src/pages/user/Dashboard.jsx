@@ -959,10 +959,10 @@ const Dashboard = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-20'} ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white border-r border-gray-200 transition-all duration-300 fixed left-0 top-0 bottom-0 z-50 flex flex-col lg:flex`}>
+      <aside className={`${sidebarOpen ? 'w-72' : 'w-20'} ${mobileMenuOpen ? 'translate-x-0 w-72' : '-translate-x-full lg:translate-x-0'} bg-white border-r border-gray-200 transition-all duration-300 fixed left-0 top-0 bottom-0 z-50 flex flex-col lg:flex`}>
         {/* Logo Header */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-gray-200">
-          {sidebarOpen ? (
+          {(sidebarOpen || mobileMenuOpen) ? (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-rose-200 rounded-xl flex items-center justify-center shadow-lg">
                 {/* <Heart className="w-6 h-6 text-white fill-white" /> */}
@@ -986,7 +986,7 @@ const Dashboard = () => {
         </div>
 
         {/* User Profile Section */}
-        {sidebarOpen && (
+        {(sidebarOpen || mobileMenuOpen) && (
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold shadow-md">
@@ -1020,10 +1020,10 @@ const Dashboard = () => {
                     ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-200'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
-                title={!sidebarOpen ? item.label : ''}
+                title={!sidebarOpen && !mobileMenuOpen ? item.label : ''}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-rose-500'} transition-colors`} />
-                {sidebarOpen && (
+                {(sidebarOpen || mobileMenuOpen) && (
                   <span className="font-medium text-sm">{item.label}</span>
                 )}
               </button>
@@ -1038,11 +1038,11 @@ const Dashboard = () => {
               navigate('/');
               setMobileMenuOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all touch-manipulation ${!sidebarOpen && 'justify-center'}`}
-            title={!sidebarOpen ? (language === 'ne' ? 'होमपेज' : 'Go to Homepage') : ''}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all touch-manipulation ${!sidebarOpen && !mobileMenuOpen && 'justify-center'}`}
+            title={!sidebarOpen && !mobileMenuOpen ? (language === 'ne' ? 'होमपेज' : 'Go to Homepage') : ''}
           >
             <Home className="w-5 h-5" />
-            {sidebarOpen && <span className="text-sm font-semibold">{language === 'ne' ? 'होमपेज जानुहोस्' : 'Return to Home'}</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span className="text-sm font-semibold">{language === 'ne' ? 'होमपेज जानुहोस्' : 'Return to Home'}</span>}
           </button>
           
           <button
@@ -1050,11 +1050,11 @@ const Dashboard = () => {
               handleLogout();
               setMobileMenuOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all touch-manipulation ${!sidebarOpen && 'justify-center'}`}
-            title={!sidebarOpen ? (language === 'ne' ? 'लगआउट' : 'Logout') : ''}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all touch-manipulation ${!sidebarOpen && !mobileMenuOpen && 'justify-center'}`}
+            title={!sidebarOpen && !mobileMenuOpen ? (language === 'ne' ? 'लगआउट' : 'Logout') : ''}
           >
             <LogOut className="w-5 h-5" />
-            {sidebarOpen && <span className="text-sm font-medium">{language === 'ne' ? 'लगआउट' : 'Logout'}</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span className="text-sm font-medium">{language === 'ne' ? 'लगआउट' : 'Logout'}</span>}
           </button>
 
           <button
