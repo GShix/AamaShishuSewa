@@ -149,6 +149,7 @@ const Dashboard = () => {
     { id: 'dashboard', label: language === 'ne' ? 'ड्यासबोर्ड' : 'Dashboard', icon: LayoutDashboard },
     { id: 'bookings', label: language === 'ne' ? 'मेरो बुकिङहरू' : 'My Bookings', icon: Calendar },
     { id: 'services', label: language === 'ne' ? 'सेवाहरू' : 'Services', icon: Package },
+    { id: 'feeds', label: language === 'ne' ? 'समाचार' : 'Feeds', icon: FileText },
     { id: 'profile', label: language === 'ne' ? 'प्रोफाइल' : 'Profile', icon: User },
   ];
 
@@ -543,6 +544,24 @@ const Dashboard = () => {
     <ProfileSettings language={language} />
   );
 
+  const renderFeeds = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+        <div className="text-center py-12">
+          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            {language === 'ne' ? 'छिट्टै आउँदैछ' : 'Coming Soon'}
+          </h3>
+          <p className="text-gray-500">
+            {language === 'ne' 
+              ? 'प्रशासकद्वारा पोस्ट गरिएका समाचार र अपडेटहरू यहाँ देखिनेछन्' 
+              : 'News and updates posted by admin will appear here'}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -551,6 +570,8 @@ const Dashboard = () => {
         return renderServices();
       case 'bookings':
         return renderBookings();
+      case 'feeds':
+        return renderFeeds();
       case 'profile':
         return renderProfile();
       default:
@@ -755,6 +776,8 @@ const Dashboard = () => {
           t={{ nav: menuItems }} 
           language={language}
           onLogout={handleLogout}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
       </div>
     </div>

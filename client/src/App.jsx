@@ -134,8 +134,8 @@ function AppContent() {
         <Route path="/careers/apply" element={<Apply />} />
 
         {/* Leaderboard */}
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/employee_profile/:id" element={<EmployeeDetail />} />
+        {/* <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/employee_profile/:id" element={<EmployeeDetail />} /> */}
 
         {/* --- AUTH REDIRECT ROUTES (Redirects to dashboard if logged in) --- */}
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

@@ -1,7 +1,7 @@
 // client/src/components/admin/ServicesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, RefreshCw, X } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 const ServicesManagement = () => {
   const [services, setServices] = useState([]);
@@ -13,6 +13,7 @@ const ServicesManagement = () => {
     description: '',
     category: '',
     price: '',
+    pricing_type: 'fixed',
     duration: '',
     features: ''
   });
@@ -24,10 +25,7 @@ const ServicesManagement = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get('/api/admin/services', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getServices();
       setServices(response.data.services || []);
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -39,27 +37,19 @@ const ServicesManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
       const data = {
         ...formData,
-        price: parseFloat(formData.price) || 0,
+        price: formData.pricing_type === 'custom' ? null : (parseFloat(formData.price) || 0),
+        pricing_type: formData.pricing_type,
         duration: parseInt(formData.duration) || 60,
         features: formData.features.split(',').map(f => f.trim()).filter(Boolean)
       };
 
       if (editingId) {
-        await axios.put(
-          `/api/admin/services/${editingId}`,
-          data,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.updateService(editingId, data);
         alert('Service updated successfully');
       } else {
-        await axios.post(
-          '/api/admin/services',
-          data,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.createService(data);
         alert('Service created successfully');
       }
 
@@ -78,7 +68,8 @@ const ServicesManagement = () => {
       name: service.name,
       description: service.description,
       category: service.category,
-      price: service.price,
+      price: service.price || '',
+      pricing_type: service.pricing_type || 'fixed',
       duration: service.duration,
       features: Array.isArray(service.features) ? service.features.join(', ') : ''
     });
@@ -90,10 +81,7 @@ const ServicesManagement = () => {
     if (!confirm('Are you sure you want to delete this service?')) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`/api/admin/services/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await adminAPI.deleteService(id);
       alert('Service deleted successfully');
       fetchServices();
     } catch (error) {
@@ -108,6 +96,7 @@ const ServicesManagement = () => {
       description: '',
       category: '',
       price: '',
+      pricing_type: 'fixed',
       duration: '',
       features: ''
     });
@@ -165,7 +154,13 @@ const ServicesManagement = () => {
               <div className="space-y-2 mb-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Price:</span>
-                  <span className="font-semibold">Rs. {service.price}</span>
+                  {service.pricing_type === 'custom' ? (
+                    <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                      Custom Pricing
+                    </span>
+                  ) : (
+                    <span className="font-semibold">Rs. {service.price}</span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Duration:</span>
@@ -239,21 +234,51 @@ const ServicesManagement = () => {
                 rows="3"
               />
 
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pricing Type *
+                </label>
+                <select
+                  value={formData.pricing_type}
+                  onChange={(e) => setFormData({...formData, pricing_type: e.target.value, price: e.target.value === 'custom' ? '' : formData.price})}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="fixed">Fixed Price</option>
+                  <option value="custom">Custom Pricing</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  placeholder="Price (Rs)"
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  className="px-4 py-2 border rounded-lg"
-                />
-                <input
-                  type="number"
-                  placeholder="Duration (minutes)"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                  className="px-4 py-2 border rounded-lg"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {formData.pricing_type === 'custom' ? 'Price (Optional)' : 'Price (Rs) *'}
+                  </label>
+                  <input
+                    type="number"
+                    placeholder={formData.pricing_type === 'custom' ? 'Custom pricing' : 'Enter price'}
+                    value={formData.price}
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    className="w-full px-4 py-2 border rounded-lg"
+                    required={formData.pricing_type === 'fixed'}
+                    disabled={formData.pricing_type === 'custom'}
+                  />
+                  {formData.pricing_type === 'custom' && (
+                    <p className="text-xs text-gray-500 mt-1">Price will be discussed with client</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Duration (minutes)"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
               </div>
 
               <input

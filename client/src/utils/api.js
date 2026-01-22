@@ -77,6 +77,12 @@ export const adminAPI = {
   createNotice: (data) => api.post('/admin/notices', data),
   updateNotice: (id, data) => api.put(`/admin/notices/${id}`, data),
   deleteNotice: (id) => api.delete(`/admin/notices/${id}`),
+  
+  // Posts Management
+  getPosts: (params) => api.get('/admin/posts', { params }),
+  createPost: (data) => api.post('/admin/posts', data),
+  updatePost: (id, data) => api.put(`/admin/posts/${id}`, data),
+  deletePost: (id) => api.delete(`/admin/posts/${id}`),
 };
 
 export const bookingAPI = {

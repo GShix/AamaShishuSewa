@@ -1,7 +1,7 @@
 // client/src/components/admin/NoticesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, RefreshCw, X, AlertCircle } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 const NoticesManagement = () => {
   const [notices, setNotices] = useState([]);
@@ -23,10 +23,7 @@ const NoticesManagement = () => {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get('/api/admin/notices', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getNotices();
       setNotices(response.data.notices || []);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -38,21 +35,11 @@ const NoticesManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
-
       if (editingId) {
-        await axios.put(
-          `/api/admin/notices/${editingId}`,
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.updateNotice(editingId, formData);
         alert('Notice updated successfully');
       } else {
-        await axios.post(
-          '/api/admin/notices',
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.createNotice(formData);
         alert('Notice created successfully');
       }
 
@@ -82,10 +69,7 @@ const NoticesManagement = () => {
     if (!confirm('Are you sure you want to delete this notice?')) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`/api/admin/notices/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await adminAPI.deleteNotice(id);
       alert('Notice deleted successfully');
       fetchNotices();
     } catch (error) {

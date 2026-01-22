@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Briefcase, Calendar, UserCircle, Phone, Info, Users, Newspaper, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const UserMobileBottomNav = ({ t, language, onLogout }) => {
+const UserMobileBottomNav = ({ t, language, onLogout, activeTab, onTabChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
@@ -20,7 +20,7 @@ const UserMobileBottomNav = ({ t, language, onLogout }) => {
       id: 'dashboard',
       icon: Home, 
       label: language === 'ne' ? 'होम' : 'Home', 
-      path: '/dashboard',
+      tab: 'dashboard',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
@@ -28,24 +28,24 @@ const UserMobileBottomNav = ({ t, language, onLogout }) => {
       id: 'services',
       icon: Briefcase, 
       label: language === 'ne' ? 'सेवा' : 'Services', 
-      path: '/services',
+      tab: 'services',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
     { 
-      id: 'newbooking',
+      id: 'bookings',
       icon: Calendar, 
-      label: language === 'ne' ? 'नयाँ बुक' : 'Book', 
-      path: '/book',
+      label: language === 'ne' ? 'बुकिङ' : 'Bookings', 
+      tab: 'bookings',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400',
       highlighted: true // This will be the main CTA
     },
     { 
-      id: 'leaderboard',
-      icon: Users, 
-      label: language === 'ne' ? 'कर्मचारी' : 'Staff', 
-      path: '/leaderboard',
+      id: 'feeds',
+      icon: Newspaper, 
+      label: language === 'ne' ? 'समाचार' : 'Feeds', 
+      tab: 'feeds',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
@@ -59,14 +59,8 @@ const UserMobileBottomNav = ({ t, language, onLogout }) => {
     },
   ];
 
-  const isActive = (path) => {
-    if (path === '/dashboard') {
-      return location.pathname === '/dashboard';
-    }
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
+  const isActive = (tabId) => {
+    return activeTab === tabId;
   };
 
   return (
@@ -76,14 +70,14 @@ const UserMobileBottomNav = ({ t, language, onLogout }) => {
         <div className="flex justify-around items-center px-2 py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.path);
+            const active = isActive(item.tab);
             
             if (item.highlighted) {
-              // Highlighted/Primary button (Book Now)
+              // Highlighted/Primary button (Bookings)
               return (
                 <button
                   key={item.id}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => item.tab && onTabChange(item.tab)}
                   className="flex flex-col items-center justify-center -mt-6 transition-transform active:scale-95"
                 >
                   <div className="bg-gradient-to-br from-rose-500 to-rose-600 rounded-full p-4 shadow-lg shadow-rose-200 mb-1">
@@ -100,7 +94,13 @@ const UserMobileBottomNav = ({ t, language, onLogout }) => {
             return (
               <button
                 key={item.id}
-                onClick={() => item.action === 'logout' ? handleLogout() : navigate(item.path)}
+                onClick={() => {
+                  if (item.action === 'logout') {
+                    handleLogout();
+                  } else if (item.tab) {
+                    onTabChange(item.tab);
+                  }
+                }}
                 className={`flex flex-col items-center justify-center py-2 px-3 transition-all duration-200 active:scale-95 ${
                   active ? 'scale-105' : 'scale-100'
                 }`}
