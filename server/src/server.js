@@ -12,6 +12,7 @@ import adminJobRoutes from './routes/admin/jobs.js';
 import userJobRoutes from './routes/user/jobs.js';
 import userBookingRoutes from './routes/user/bookings.js';
 import userServiceRoutes from './routes/user/services.js';
+import debugRoutes from './routes/debug.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -52,6 +53,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/jobs', userJobRoutes);
 app.use('/api/bookings', userBookingRoutes);
 app.use('/api/services', userServiceRoutes);
+app.use('/api/debug', debugRoutes); // Temporary debug routes
 
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);
