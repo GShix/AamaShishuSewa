@@ -1,8 +1,11 @@
 import axios from 'axios';
 
-// Create axios instance with relative baseURL to use Vite proxy
+// Use environment variable for API URL, fallback to relative path for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
+// Create axios instance
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
 });
 
 // Add a request interceptor to include the JWT token

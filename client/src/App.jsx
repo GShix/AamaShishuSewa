@@ -1,5 +1,5 @@
 // client/src/App.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
@@ -25,8 +25,34 @@ import AdminPanel from './pages/admin/AdminPanel';
 import InstallPrompt from './components/common/InstallPrompt';
 import UpdateNotification from './components/common/UpdateNotification';
 import OfflineIndicator from './components/common/OfflineIndicator';
+import SplashScreen from './components/common/SplashScreen';
 
 function AppContent() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+
+  useEffect(() => {
+    // Check if this is the first visit
+    const hasVisited = localStorage.getItem('hasVisited');
+    
+    if (!hasVisited) {
+      setIsFirstVisit(true);
+      localStorage.setItem('hasVisited', 'true');
+    } else {
+      // Skip splash screen for returning visitors
+      setShowSplash(false);
+    }
+  }, []);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
+
+  // Show splash screen only on first visit
+  if (showSplash && isFirstVisit) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
+
   // Protected Route Component
   const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, loading } = useAuth();

@@ -19,7 +19,7 @@ const Footer = ({ t, language }) => {
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <div className="bg-rose-200 p-2 rounded-xl shadow-lg">
-              <img className='h-7 w-7 object-contain' src="/assets/logo.png" alt="Logo" />
+              <img className='h-7 w-7 object-contain' src="/logo.png" alt="Logo" />
             </div>
             <span className="text-2xl font-black tracking-tight text-nowrap">
               {language === 'ne' ? 'आमा शिशु सेवा' : 'Aama Shishu Sewa'}

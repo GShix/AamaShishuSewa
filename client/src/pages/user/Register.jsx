@@ -276,9 +276,9 @@ const Register = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4">
-              <div className="bg-gradient-to-br from-red-500 to-orange-500 p-3 rounded-2xl">
-                <img className='h-6 w-6 object-contain' src="/assets/logo.png" alt="Logo" />
+            <Link to="/" className="inline-flex flex-col items-center justify-center space-y-3 mb-4">
+              <div className="bg-gradient-to-br from-red-500 to-orange-500 p-4 rounded-full shadow-lg">
+                <img className='h-12 w-12 object-contain' src="/logo.png" alt="Logo" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
                 आमा शिशु सेवा
