@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Facebook, Instagram, Mail, MapPin, 
   Phone, Clock, Heart 
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Footer = ({ t, language }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const currentYear = new Date().getFullYear();
 
   // Guard clause to handle loading state
@@ -93,12 +96,18 @@ const Footer = ({ t, language }) => {
           <p className="text-xs text-slate-400 leading-relaxed mb-4">
             {t.footer?.ctaDesc || 'Our care coordinators are available to help you choose the best package.'}
           </p>
-          <Link 
-            to="/book" 
-            className="block w-full text-center py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition-colors"
+          <button 
+            onClick={() => {
+              if (isAuthenticated) {
+                navigate('/dashboard');
+              } else {
+                navigate('/login', { state: { from: '/dashboard' } });
+              }
+            }}
+            className="block w-full text-center py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition-colors cursor-pointer"
           >
             {t.footer?.ctaBtn || 'BOOK AN APPOINTMENT'}
-          </Link>
+          </button>
         </div>
       </div>
 

@@ -62,20 +62,15 @@ const Header = ({ language, setLanguage, t }) => {
           </button>
         </div>
 
-        {/* Mobile Section - Simplified (Bottom Nav handles main navigation) */}
+        {/* Mobile Section - Menu with navigation */}
         <div className="md:hidden flex items-center gap-2">
-          {/* Language Toggle for Mobile */}
-          <div className="relative">
-            <button onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} className="p-2 rounded-lg text-slate-600 cursor-pointer hover:bg-rose-50 transition">
-              <Globe className="w-5 h-5 hover:text-rose-500" />
-            </button>
-            {isLangDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-white border border-rose-100 rounded-xl shadow-xl z-50 py-2">
-                <button onClick={() => { setLanguage('ne'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">नेपाली</button>
-                <button onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">English</button>
-              </div>
-            )}
-          </div>
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            className="p-2 rounded-lg text-slate-600 cursor-pointer hover:bg-rose-50 transition"
+          >
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
 
           {/* Login/Profile Button */}
           {!isAuthenticated ? (
@@ -84,7 +79,6 @@ const Header = ({ language, setLanguage, t }) => {
               className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition shadow-md cursor-pointer"
             >
               <UserCircle className="w-4 h-4" />
-              {/* {language === 'ne' ? 'लगइन' : 'Login'} */}
             </button>
           ) : (
             <button 
@@ -96,6 +90,40 @@ const Header = ({ language, setLanguage, t }) => {
             </button>
           )}
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="absolute top-20 left-0 right-0 bg-white border-t border-gray-200 shadow-xl md:hidden z-40">
+            <nav className="flex flex-col">
+              {filteredNav?.map((item, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    navigate(item.path);
+                    setIsMenuOpen(false);
+                  }}
+                  className="px-6 py-4 text-left text-sm font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition border-b border-gray-100 cursor-pointer"
+                >
+                  {item.name}
+                </button>
+              ))}
+              
+              {/* Language Toggle in Menu */}
+              <div className="px-6 py-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setLanguage(language === 'ne' ? 'en' : 'ne');
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-xs font-black text-slate-700 hover:bg-white transition-all cursor-pointer w-full justify-center"
+                >
+                  <Globe className="w-3.5 h-3.5 text-rose-500" />
+                  {language === 'ne' ? 'ENGLISH' : 'नेपाली'}
+                </button>
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Mobile Menu Overlay - Removed (using bottom nav instead) */}

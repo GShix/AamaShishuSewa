@@ -9,6 +9,7 @@ import Dashboard from './pages/user/Dashboard';
 import JoinUs from './pages/JoinUs';
 import Services from './pages/Services';
 import BookService from './pages/BookService';
+import BookAppointment from './pages/BookAppointment';
 import Contact from './pages/Contact';
 import ScrollToTop from './components/common/ScrollToTop';
 import ForgotPassword from './pages/ForgetPassword';
@@ -141,8 +142,8 @@ function AppContent() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forget_password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-        {/* <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} /> */}
-        <Route path="/book" element={<PublicRoute><BookService /></PublicRoute>} />
+        <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} />
+        {/* <Route path="/book" element={<PublicRoute><BookService /></PublicRoute>} /> */}
 
         {/* --- PROTECTED ROUTES (Requires login) --- */}
         <Route
@@ -150,6 +151,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/book-appointment"
+          element={
+            <ProtectedRoute>
+              <BookAppointment />
             </ProtectedRoute>
           }
         />

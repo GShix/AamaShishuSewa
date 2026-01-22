@@ -8,6 +8,8 @@ import authRoutes from './routes/user/userAuth.js';
 import aiRoutes from './routes/ai.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
 import adminRoutes from './routes/admin/admin.js';
+import adminJobRoutes from './routes/admin/jobs.js';
+import userJobRoutes from './routes/user/jobs.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -45,9 +47,11 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/jobs', userJobRoutes);
 
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin/jobs', adminJobRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Error handling

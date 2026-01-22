@@ -40,7 +40,7 @@ const Home = () => {
                 {t.hero.subtitle}
               </p>
               <div className="flex flex-col sm:flex-row gap-5">
-                <button onClick={() => navigate('/book')} className="cursor-pointer px-8 py-4 bg-rose-500 text-white rounded-2xl font-black shadow-xl hover:bg-rose-600 transition-all flex items-center justify-center gap-3">
+                <button onClick={() => navigate('/services')} className="cursor-pointer px-8 py-4 bg-rose-500 text-white rounded-2xl font-black shadow-xl hover:bg-rose-600 transition-all flex items-center justify-center gap-3">
                   <Heart className="w-6 h-6 fill-white" /> {t.hero.ctaBook}
                 </button>
                 <button onClick={() => navigate('/join_us')} className="cursor-pointer px-8 py-4 bg-white border-2 border-slate-200 text-slate-800 rounded-2xl font-black hover:border-rose-300 transition-all flex items-center justify-center gap-3">

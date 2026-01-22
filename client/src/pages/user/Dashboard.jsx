@@ -47,6 +47,16 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [language, setLanguage] = useState('ne');
+  
+  // Careers section state
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [applying, setApplying] = useState(false);
+  const [applicationData, setApplicationData] = useState({
+    cover_letter: '',
+    resume_url: '',
+    phone: '',
+    email: ''
+  });
 
   const translations = {
     ne: {
@@ -120,6 +130,17 @@ const Dashboard = () => {
     fetchMyApplications();
   }, [isAuthenticated, navigate]);
 
+  // Initialize application data when user is loaded
+  useEffect(() => {
+    if (user) {
+      setApplicationData(prev => ({
+        ...prev,
+        phone: user.phone || '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
+
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -170,7 +191,8 @@ const Dashboard = () => {
 
   const menuItems = [
     { id: 'dashboard', label: language === 'ne' ? 'ड्यासबोर्ड' : 'Dashboard', icon: LayoutDashboard },
-    { id: 'bookings', label: language === 'ne' ? 'मेरो बुकिङहरू' : 'My Bookings', icon: Calendar },
+    { id: 'bookings', label: language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings', icon: Calendar },
+    { id: 'appointments', label: language === 'ne' ? 'ग्राहक अपोइन्टमेन्टहरू' : 'Customer Appointments', icon: Clock },
     { id: 'services', label: language === 'ne' ? 'सेवाहरू' : 'Services', icon: Package },
     { id: 'careers', label: language === 'ne' ? 'रोजगारी' : 'Careers', icon: Briefcase },
     { id: 'feeds', label: language === 'ne' ? 'समाचार' : 'Feeds', icon: FileText },
@@ -331,20 +353,20 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <button
-            onClick={() => setActiveTab('services')}
+            onClick={() => navigate('/book-appointment')}
             className="bg-gradient-to-r from-rose-500 to-orange-500 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
-                {language === 'ne' ? 'सेवा बुक गर्नुहोस्' : 'Book Services'}
+                {language === 'ne' ? 'अपोइन्टमेन्ट बुक गर्नुहोस्' : 'Book Appointment'}
               </h3>
               <p className="text-rose-100 text-xs lg:text-sm mt-1">
-                {language === 'ne' ? 'उपलब्ध सेवाहरू हेर्नुहोस्' : 'View available services'}
+                {language === 'ne' ? 'नयाँ अपोइन्टमेन्ट' : 'Schedule new'}
               </p>
             </div>
-            <Package className="w-8 lg:w-10 h-8 lg:h-10 group-hover:scale-110 transition-transform" />
+            <Plus className="w-8 lg:w-10 h-8 lg:h-10 group-hover:scale-110 transition-transform" />
           </button>
 
           <button
@@ -353,25 +375,40 @@ const Dashboard = () => {
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
-                {language === 'ne' ? 'मेरो बुकिङहरू' : 'My Bookings'}
+                {language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings'}
               </h3>
               <p className="text-blue-100 text-xs lg:text-sm mt-1">
-                {language === 'ne' ? 'सबै बुकिङहरू व्यवस्थापन गर्नुहोस्' : 'Manage all bookings'}
+                {language === 'ne' ? 'सेवा बुकिङ हेर्नुहोस्' : 'View bookings'}
               </p>
             </div>
             <Calendar className="w-8 lg:w-10 h-8 lg:h-10 group-hover:scale-110 transition-transform" />
           </button>
 
           <button
+            onClick={() => setActiveTab('appointments')}
+            className="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
+          >
+            <div className="text-left">
+              <h3 className="font-bold text-base lg:text-lg">
+                {language === 'ne' ? 'ग्राहक अपोइन्टमेन्ट' : 'Appointments'}
+              </h3>
+              <p className="text-teal-100 text-xs lg:text-sm mt-1">
+                {language === 'ne' ? 'अपोइन्टमेन्ट हेर्नुहोस्' : 'View appointments'}
+              </p>
+            </div>
+            <Clock className="w-8 lg:w-10 h-8 lg:h-10 group-hover:scale-110 transition-transform" />
+          </button>
+
+          <button
             onClick={() => setActiveTab('profile')}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation sm:col-span-2 lg:col-span-1"
+            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
                 {language === 'ne' ? 'मेरो प्रोफाइल' : 'My Profile'}
               </h3>
               <p className="text-purple-100 text-xs lg:text-sm mt-1">
-                {language === 'ne' ? 'प्रोफाइल अपडेट गर्नुहोस्' : 'Update profile'}
+                {language === 'ne' ? 'प्रोफाइल अपडेट' : 'Update profile'}
               </p>
             </div>
             <User className="w-8 lg:w-10 h-8 lg:h-10 group-hover:scale-110 transition-transform" />
@@ -449,13 +486,15 @@ const Dashboard = () => {
   const renderBookings = () => (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h2 className="text-xl lg:text-2xl font-bold text-gray-900">{t.myBookings}</h2>
+        <h2 className="text-xl lg:text-2xl font-bold text-gray-900">
+          {language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings'}
+        </h2>
         <button
           onClick={() => setActiveTab('services')}
           className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
         >
           <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
-          <span>{t.newBooking}</span>
+          <span>{language === 'ne' ? 'नयाँ बुकिङ' : 'New Booking'}</span>
         </button>
       </div>
 
@@ -564,6 +603,41 @@ const Dashboard = () => {
     </div>
   );
 
+  const renderAppointments = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h2 className="text-xl lg:text-2xl font-bold text-gray-900">
+          {language === 'ne' ? 'ग्राहक अपोइन्टमेन्टहरू' : 'Customer Appointments'}
+        </h2>
+        <button
+          onClick={() => navigate('/book-appointment')}
+          className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
+        >
+          <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
+          <span>{language === 'ne' ? 'नयाँ अपोइन्टमेन्ट' : 'New Appointment'}</span>
+        </button>
+      </div>
+
+      <div className="bg-white rounded-2xl lg:rounded-3xl shadow-lg p-8 lg:p-12 text-center">
+        <Clock className="w-16 lg:w-20 h-16 lg:h-20 text-gray-300 mx-auto mb-4" />
+        <h4 className="text-lg lg:text-xl font-semibold text-gray-700 mb-2">
+          {language === 'ne' ? 'कुनै अपोइन्टमेन्ट छैन' : 'No Appointments Yet'}
+        </h4>
+        <p className="text-sm lg:text-base text-gray-500 mb-6">
+          {language === 'ne' 
+            ? 'परामर्श र स्वास्थ्य जाँचका लागि अपोइन्टमेन्ट बुक गर्नुहोस्' 
+            : 'Book appointments for consultations and health checkups'}
+        </p>
+        <button
+          onClick={() => navigate('/book-appointment')}
+          className="px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform touch-manipulation"
+        >
+          {language === 'ne' ? 'अपोइन्टमेन्ट बुक गर्नुहोस्' : 'Book Appointment'}
+        </button>
+      </div>
+    </div>
+  );
+
   const renderProfile = () => (
     <ProfileSettings language={language} />
   );
@@ -586,39 +660,30 @@ const Dashboard = () => {
     </div>
   );
 
+  const handleJobApply = async (e) => {
+    e.preventDefault();
+    if (!selectedJob) return;
+
+    try {
+      setApplying(true);
+      await jobsAPI.applyForJob(selectedJob.id, applicationData);
+      alert(language === 'ne' ? 'आवेदन सफलतापूर्वक पेश गरियो!' : 'Application submitted successfully!');
+      setSelectedJob(null);
+      fetchMyApplications();
+      setApplicationData({ cover_letter: '', resume_url: '', phone: user?.phone || '', email: user?.email || '' });
+    } catch (error) {
+      console.error('Error applying for job:', error);
+      alert(error.response?.data?.error || 'Failed to submit application');
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const hasApplied = (jobId) => {
+    return myApplications.some(app => app.job_id === jobId);
+  };
+
   const renderCareers = () => {
-    const [selectedJob, setSelectedJob] = useState(null);
-    const [applying, setApplying] = useState(false);
-    const [applicationData, setApplicationData] = useState({
-      cover_letter: '',
-      resume_url: '',
-      phone: user?.phone || '',
-      email: user?.email || ''
-    });
-
-    const handleApply = async (e) => {
-      e.preventDefault();
-      if (!selectedJob) return;
-
-      try {
-        setApplying(true);
-        await jobsAPI.applyForJob(selectedJob.id, applicationData);
-        alert(language === 'ne' ? 'आवेदन सफलतापूर्वक पेश गरियो!' : 'Application submitted successfully!');
-        setSelectedJob(null);
-        fetchMyApplications();
-        setApplicationData({ cover_letter: '', resume_url: '', phone: user?.phone || '', email: user?.email || '' });
-      } catch (error) {
-        console.error('Error applying for job:', error);
-        alert(error.response?.data?.error || 'Failed to submit application');
-      } finally {
-        setApplying(false);
-      }
-    };
-
-    const hasApplied = (jobId) => {
-      return myApplications.some(app => app.job_id === jobId);
-    };
-
     return (
       <div className="space-y-6">
         {/* My Applications */}
@@ -771,7 +836,7 @@ const Dashboard = () => {
                 )}
 
                 {!hasApplied(selectedJob.id) && (
-                  <form onSubmit={handleApply} className="space-y-4 pt-4 border-t border-gray-200">
+                  <form onSubmit={handleJobApply} className="space-y-4 pt-4 border-t border-gray-200">
                     <h4 className="font-semibold text-gray-900">{language === 'ne' ? 'आवेदन फारम' : 'Application Form'}</h4>
                     
                     <div className="grid grid-cols-2 gap-4">
@@ -866,10 +931,12 @@ const Dashboard = () => {
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
-      case 'services':
-        return renderServices();
       case 'bookings':
         return renderBookings();
+      case 'appointments':
+        return renderAppointments();
+      case 'services':
+        return renderServices();
       case 'careers':
         return renderCareers();
       case 'feeds':
