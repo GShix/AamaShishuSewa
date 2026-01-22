@@ -290,11 +290,11 @@ const AdminPanel = () => {
       <aside
         className={`${
           sidebarOpen ? 'w-64' : 'w-20'
-        } ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-gradient-to-b from-indigo-900 to-purple-900 text-white transition-all duration-300 flex flex-col fixed h-full z-50`}
+        } ${mobileMenuOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'} bg-gradient-to-b from-indigo-900 to-purple-900 text-white transition-all duration-300 flex flex-col fixed h-full z-50`}
       >
         {/* Logo */}
         <div className="p-4 flex items-center justify-between border-b border-indigo-700">
-          {sidebarOpen ? (
+          {(sidebarOpen || mobileMenuOpen) ? (
             <div className="flex items-center gap-3">
               <Shield className="w-8 h-8" />
               <div>
@@ -308,7 +308,7 @@ const AdminPanel = () => {
         </div>
 
         {/* Admin Info */}
-        {sidebarOpen && adminUser && (
+        {(sidebarOpen || mobileMenuOpen) && adminUser && (
           <div className="p-4 bg-indigo-800 border-b border-indigo-700">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
@@ -345,7 +345,7 @@ const AdminPanel = () => {
                 }`}
               >
                 <Icon className="w-5 h-5 shrink-0" />
-                {sidebarOpen && <span className="font-medium">{item.label}</span>}
+                {(sidebarOpen || mobileMenuOpen) && <span className="font-medium">{item.label}</span>}
               </button>
             );
           })}
@@ -361,7 +361,7 @@ const AdminPanel = () => {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition-all text-white touch-manipulation"
           >
             <LogOut className="w-5 h-5 shrink-0" />
-            {sidebarOpen && <span className="font-medium">Logout</span>}
+            {(sidebarOpen || mobileMenuOpen) && <span className="font-medium">Logout</span>}
           </button>
         </div>
 

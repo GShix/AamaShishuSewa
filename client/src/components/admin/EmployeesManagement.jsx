@@ -1,7 +1,7 @@
 // client/src/components/admin/EmployeesManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, RefreshCw, X } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 const EmployeesManagement = () => {
   const [employees, setEmployees] = useState([]);
@@ -29,11 +29,8 @@ const EmployeesManagement = () => {
   const fetchProfessionals = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const params = searchTerm ? `?search=${searchTerm}` : '';
-      const response = await axios.get(`/api/admin/employees${params}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const params = searchTerm ? { search: searchTerm } : {};
+      const response = await adminAPI.getEmployees(params);
       // Handle both 'employees' and 'employees' response keys for backward compatibility
       setEmployees(response.data.employees || response.data.employees || []);
     } catch (error) {
@@ -47,21 +44,11 @@ const EmployeesManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('adminToken');
-      
       if (editingId) {
-        await axios.put(
-          `/api/admin/employees/${editingId}`,
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.updateEmployee(editingId, formData);
         alert('Professional updated successfully');
       } else {
-        await axios.post(
-          '/api/admin/employees',
-          formData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await adminAPI.createEmployee(formData);
         alert('Professional created successfully');
       }
       
@@ -96,10 +83,7 @@ const EmployeesManagement = () => {
     if (!confirm('Are you sure you want to delete this employee?')) return;
     
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`/api/admin/employees/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await adminAPI.deleteEmployee(id);
       alert('Professional deleted successfully');
       fetchProfessionals();
     } catch (error) {

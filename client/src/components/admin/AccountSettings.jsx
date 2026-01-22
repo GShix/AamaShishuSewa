@@ -1,7 +1,7 @@
 // client/src/components/admin/AccountSettings.jsx
 import React, { useState } from 'react';
 import { User, Mail, Phone, Shield, Lock, Save, Crown } from 'lucide-react';
-import axios from 'axios';
+import { adminAuthAPI } from '../../utils/api';
 
 const AccountSettings = ({ adminUser }) => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -21,12 +21,7 @@ const AccountSettings = ({ adminUser }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.put(
-        '/api/admin/auth/profile',
-        profileData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await adminAuthAPI.updateProfile(profileData);
 
       // Update localStorage
       const updatedUser = { ...adminUser, ...response.data.user };
@@ -57,15 +52,10 @@ const AccountSettings = ({ adminUser }) => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      await axios.put(
-        '/api/admin/auth/change-password',
-        {
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await adminAuthAPI.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
 
       alert('Password changed successfully');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });

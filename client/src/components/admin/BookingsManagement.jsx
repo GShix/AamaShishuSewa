@@ -1,7 +1,7 @@
 // client/src/components/admin/BookingsManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Calendar, RefreshCw, Eye, CheckCircle, XCircle } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 const BookingsManagement = () => {
   const [bookings, setBookings] = useState([]);
@@ -18,17 +18,14 @@ const BookingsManagement = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const params = new URLSearchParams({
+      const params = {
         page: pagination.page,
         limit: pagination.limit,
         ...(filterStatus && { status: filterStatus }),
         ...(searchTerm && { search: searchTerm })
-      });
+      };
 
-      const response = await axios.get(`/api/admin/bookings?${params}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getBookings(params);
 
       setBookings(response.data.bookings || []);
       setPagination(prev => ({ ...prev, ...response.data.pagination }));
@@ -41,12 +38,7 @@ const BookingsManagement = () => {
 
   const handleStatusChange = async (bookingId, newStatus) => {
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.patch(
-        `/api/admin/bookings/${bookingId}/status`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await adminAPI.updateBookingStatus(bookingId, { status: newStatus });
       
       alert('Booking status updated successfully');
       fetchBookings();

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Mail, Lock, AlertCircle, Loader, Eye, EyeOff, UserCheck, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
+import { adminAuthAPI } from '../../utils/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const AdminLogin = () => {
 
     try {
       console.log('Attempting login with:', { email: formData.email });
-      const response = await axios.post('/api/admin/auth/login', formData);
+      const response = await adminAuthAPI.login(formData);
       
       console.log('Login response:', response.data);
       const { user, token } = response.data;
