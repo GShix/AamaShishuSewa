@@ -13,6 +13,7 @@ import axios from 'axios';
 import BookingsManagement from '../../components/admin/BookingsManagement';
 import ServicesManagement from '../../components/admin/ServicesManagement';
 import PostsManagement from '../../components/admin/PostsManagement';
+import JobsManagement from '../../components/admin/JobsManagement';
 import AccountSettings from '../../components/admin/AccountSettings';
 import UsersManagement from '../../components/admin/UsersManagement';
 import EmployeesManagement from '../../components/admin/EmployeesManagement';
@@ -72,6 +73,7 @@ const AdminPanel = () => {
     { id: 'employees', label: 'Employees', icon: Briefcase },
     { id: 'services', label: 'Services', icon: FileText },
     { id: 'posts', label: 'Posts & Notices', icon: Bell },
+    { id: 'jobs', label: 'Jobs & Careers', icon: Briefcase },
     { id: 'settings', label: 'Account Settings', icon: Settings },
   ];
 
@@ -242,6 +244,8 @@ const AdminPanel = () => {
         return <ServicesManagement />;
       case 'posts':
         return <PostsManagement />;
+      case 'jobs':
+        return <JobsManagement />;
       case 'settings':
         return <AccountSettings adminUser={adminUser} />;
       default:

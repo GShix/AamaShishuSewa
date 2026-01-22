@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { bookingAPI, adminAPI } from '../../utils/api';
+import { bookingAPI, adminAPI, jobsAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
 import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
 import { 
@@ -28,6 +28,7 @@ import {
   Package,
   DollarSign,
   Home,
+  Briefcase,
   Bell,
   Search,
   Globe,
@@ -39,6 +40,8 @@ const Dashboard = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [myApplications, setMyApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
@@ -113,6 +116,8 @@ const Dashboard = () => {
     }
     fetchBookings();
     fetchServices();
+    fetchJobs();
+    fetchMyApplications();
   }, [isAuthenticated, navigate]);
 
   const fetchBookings = async () => {
@@ -136,6 +141,24 @@ const Dashboard = () => {
     }
   };
 
+  const fetchJobs = async () => {
+    try {
+      const response = await jobsAPI.getOpenJobs({ status: 'open' });
+      setJobs(response.data.jobs || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  const fetchMyApplications = async () => {
+    try {
+      const response = await jobsAPI.getMyApplications();
+      setMyApplications(response.data.applications || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -149,6 +172,7 @@ const Dashboard = () => {
     { id: 'dashboard', label: language === 'ne' ? 'ड्यासबोर्ड' : 'Dashboard', icon: LayoutDashboard },
     { id: 'bookings', label: language === 'ne' ? 'मेरो बुकिङहरू' : 'My Bookings', icon: Calendar },
     { id: 'services', label: language === 'ne' ? 'सेवाहरू' : 'Services', icon: Package },
+    { id: 'careers', label: language === 'ne' ? 'रोजगारी' : 'Careers', icon: Briefcase },
     { id: 'feeds', label: language === 'ne' ? 'समाचार' : 'Feeds', icon: FileText },
     { id: 'profile', label: language === 'ne' ? 'प्रोफाइल' : 'Profile', icon: User },
   ];
@@ -562,6 +586,282 @@ const Dashboard = () => {
     </div>
   );
 
+  const renderCareers = () => {
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [applying, setApplying] = useState(false);
+    const [applicationData, setApplicationData] = useState({
+      cover_letter: '',
+      resume_url: '',
+      phone: user?.phone || '',
+      email: user?.email || ''
+    });
+
+    const handleApply = async (e) => {
+      e.preventDefault();
+      if (!selectedJob) return;
+
+      try {
+        setApplying(true);
+        await jobsAPI.applyForJob(selectedJob.id, applicationData);
+        alert(language === 'ne' ? 'आवेदन सफलतापूर्वक पेश गरियो!' : 'Application submitted successfully!');
+        setSelectedJob(null);
+        fetchMyApplications();
+        setApplicationData({ cover_letter: '', resume_url: '', phone: user?.phone || '', email: user?.email || '' });
+      } catch (error) {
+        console.error('Error applying for job:', error);
+        alert(error.response?.data?.error || 'Failed to submit application');
+      } finally {
+        setApplying(false);
+      }
+    };
+
+    const hasApplied = (jobId) => {
+      return myApplications.some(app => app.job_id === jobId);
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* My Applications */}
+        {myApplications.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              {language === 'ne' ? 'मेरो आवेदनहरू' : 'My Applications'}
+            </h3>
+            <div className="space-y-3">
+              {myApplications.map((app) => (
+                <div key={app.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{app.job_title}</h4>
+                    <p className="text-sm text-gray-500">
+                      {language === 'ne' ? 'आवेदन दिइएको: ' : 'Applied: '}
+                      {new Date(app.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    app.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                    app.status === 'shortlisted' ? 'bg-green-100 text-green-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {app.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Open Jobs */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">
+            {language === 'ne' ? 'खुला रोजगारी' : 'Open Positions'}
+          </h3>
+          {jobs.length === 0 ? (
+            <div className="text-center py-12">
+              <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">
+                {language === 'ne' ? 'हाल कुनै खुला रोजगारी छैन' : 'No open positions at the moment'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {jobs.map((job) => (
+                <div key={job.id} className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-1">{job.title}</h4>
+                      <p className="text-sm text-gray-600">{job.department}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                      {job.employment_type.replace('-', ' ')}
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {job.location}
+                    </div>
+                    {job.salary_range && (
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4" />
+                        {job.salary_range}
+                      </div>
+                    )}
+                    {job.deadline && (
+                      <div className="flex items-center gap-1 text-orange-600">
+                        <Clock className="w-4 h-4" />
+                        Apply by: {new Date(job.deadline).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="text-gray-700 text-sm line-clamp-2 mb-4">{job.description}</p>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedJob(job)}
+                      className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition"
+                    >
+                      {language === 'ne' ? 'विवरण हेर्नुहोस्' : 'View Details'}
+                    </button>
+                    {hasApplied(job.id) ? (
+                      <button
+                        disabled
+                        className="flex-1 px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg cursor-not-allowed"
+                      >
+                        {language === 'ne' ? 'आवेदन दिइएको छ' : 'Applied'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setSelectedJob(job)}
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:from-blue-600 hover:to-indigo-600 transition"
+                      >
+                        {language === 'ne' ? 'आवेदन दिनुहोस्' : 'Apply Now'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Job Detail & Application Modal */}
+        {selectedJob && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-900">{selectedJob.title}</h3>
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {/* Job Info */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">{language === 'ne' ? 'विवरण' : 'Description'}</h4>
+                  <p className="text-gray-700">{selectedJob.description}</p>
+                </div>
+
+                {selectedJob.requirements && selectedJob.requirements.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">{language === 'ne' ? 'आवश्यकता' : 'Requirements'}</h4>
+                    <ul className="list-disc list-inside space-y-1 text-gray-700">
+                      {selectedJob.requirements.map((req, idx) => (
+                        <li key={idx}>{req}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedJob.responsibilities && selectedJob.responsibilities.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">{language === 'ne' ? 'जिम्मेवारी' : 'Responsibilities'}</h4>
+                    <ul className="list-disc list-inside space-y-1 text-gray-700">
+                      {selectedJob.responsibilities.map((resp, idx) => (
+                        <li key={idx}>{resp}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {!hasApplied(selectedJob.id) && (
+                  <form onSubmit={handleApply} className="space-y-4 pt-4 border-t border-gray-200">
+                    <h4 className="font-semibold text-gray-900">{language === 'ne' ? 'आवेदन फारम' : 'Application Form'}</h4>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {language === 'ne' ? 'फोन' : 'Phone'} *
+                        </label>
+                        <input
+                          type="tel"
+                          value={applicationData.phone}
+                          onChange={(e) => setApplicationData({...applicationData, phone: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {language === 'ne' ? 'इमेल' : 'Email'} *
+                        </label>
+                        <input
+                          type="email"
+                          value={applicationData.email}
+                          onChange={(e) => setApplicationData({...applicationData, email: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {language === 'ne' ? 'रेज्युमे लिंक' : 'Resume Link (Google Drive, Dropbox, etc.)'} *
+                      </label>
+                      <input
+                        type="url"
+                        value={applicationData.resume_url}
+                        onChange={(e) => setApplicationData({...applicationData, resume_url: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://drive.google.com/..."
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {language === 'ne' ? 'कभर लेटर' : 'Cover Letter'} *
+                      </label>
+                      <textarea
+                        value={applicationData.cover_letter}
+                        onChange={(e) => setApplicationData({...applicationData, cover_letter: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows="5"
+                        placeholder={language === 'ne' ? 'किन तपाईं यस स्थितिको लागि उपयुक्त हुनुहुन्छ भनी बताउनुहोस्...' : 'Tell us why you are a good fit for this position...'}
+                        required
+                      />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedJob(null)}
+                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+                      >
+                        {language === 'ne' ? 'रद्द गर्नुहोस्' : 'Cancel'}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={applying}
+                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 font-medium disabled:opacity-50"
+                      >
+                        {applying ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <Loader className="w-4 h-4 animate-spin" />
+                            {language === 'ne' ? 'पेश गर्दै...' : 'Submitting...'}
+                          </span>
+                        ) : (
+                          language === 'ne' ? 'आवेदन पेश गर्नुहोस्' : 'Submit Application'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -570,6 +870,8 @@ const Dashboard = () => {
         return renderServices();
       case 'bookings':
         return renderBookings();
+      case 'careers':
+        return renderCareers();
       case 'feeds':
         return renderFeeds();
       case 'profile':
@@ -610,7 +912,8 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-              <Heart className="w-6 h-6 text-white fill-white" />
+              {/* <Heart className="w-6 h-6 text-white fill-white" /> */}
+              <img className='h-8 w-8 md:h-10 md:w-10 object-contain' src="/logo.png" alt="Logo" />
             </div>
           )}
         </div>

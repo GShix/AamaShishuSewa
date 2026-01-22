@@ -83,11 +83,25 @@ export const adminAPI = {
   createPost: (data) => api.post('/admin/posts', data),
   updatePost: (id, data) => api.put(`/admin/posts/${id}`, data),
   deletePost: (id) => api.delete(`/admin/posts/${id}`),
+  
+  // Jobs Management
+  getJobs: (params) => api.get('/admin/jobs', { params }),
+  createJob: (data) => api.post('/admin/jobs', data),
+  updateJob: (id, data) => api.put(`/admin/jobs/${id}`, data),
+  deleteJob: (id) => api.delete(`/admin/jobs/${id}`),
+  getJobApplications: (jobId) => api.get(`/admin/jobs/${jobId}/applications`),
 };
 
 export const bookingAPI = {
   createBooking: (data) => api.post('/bookings', data),
   getMyBookings: () => api.get('/bookings/my-bookings'),
+};
+
+export const jobsAPI = {
+  getOpenJobs: (params) => api.get('/jobs', { params }),
+  getJobById: (id) => api.get(`/jobs/${id}`),
+  applyForJob: (jobId, data) => api.post(`/jobs/${jobId}/apply`, data),
+  getMyApplications: () => api.get('/jobs/my-applications'),
 };
 
 export default api;

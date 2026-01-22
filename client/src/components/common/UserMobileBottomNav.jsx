@@ -25,10 +25,10 @@ const UserMobileBottomNav = ({ t, language, onLogout, activeTab, onTabChange }) 
       inactiveColor: 'text-slate-400'
     },
     { 
-      id: 'services',
+      id: 'careers',
       icon: Briefcase, 
-      label: language === 'ne' ? 'सेवा' : 'Services', 
-      tab: 'services',
+      label: language === 'ne' ? 'रोजगारी' : 'Jobs', 
+      tab: 'careers',
       activeColor: 'text-rose-600',
       inactiveColor: 'text-slate-400'
     },
