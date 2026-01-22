@@ -1,7 +1,7 @@
 // client/src/components/user/ProfileSettings.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { authAPI } from '../../utils/api';
+import { userAPI } from '../../utils/api';
 import { 
   User, 
   Mail, 
@@ -55,7 +55,7 @@ const ProfileSettings = ({ language }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await authAPI.updateProfile(formData);
+      const response = await userAPI.updateProfile(formData);
       updateUser(response.data.user);
       setMessage({ 
         type: 'success', 
@@ -95,7 +95,7 @@ const ProfileSettings = ({ language }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      await authAPI.changePassword({
+      await userAPI.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       });

@@ -1,6 +1,6 @@
 // client/src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../utils/api';
+import { userAPI } from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await authAPI.register(userData);
+      const response = await userAPI.register(userData);
       const { user: newUser, token: newToken } = response.data;
 
       // Save to localStorage
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await authAPI.login({ email, password });
+      const response = await userAPI.login({ email, password });
       const { user: loggedUser, token: newToken } = response.data;
 
       // Save to localStorage
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (profileData) => {
     try {
       setError(null);
-      const response = await authAPI.updateProfile(profileData);
+      const response = await userAPI.updateProfile(profileData);
       const updatedUser = response.data.user;
 
       // Update localStorage and state

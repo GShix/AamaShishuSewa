@@ -25,11 +25,23 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const authAPI = {
+export const userAPI = {
+  // Authentication
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
+  
+  // Profile Management
+  getProfile: () => api.get('/auth/profile'),
   updateProfile: (data) => api.put('/auth/profile', data),
   changePassword: (data) => api.put('/auth/change-password', data),
+  
+  // Bookings
+  createBooking: (data) => api.post('/bookings', data),
+  getMyBookings: () => api.get('/bookings/my-bookings'),
+  
+  // Job Applications
+  applyForJob: (jobId, data) => api.post(`/jobs/${jobId}/apply`, data),
+  getMyApplications: () => api.get('/jobs/my-applications'),
 };
 
 export const adminAuthAPI = {
@@ -92,11 +104,6 @@ export const adminAPI = {
   getJobApplications: (jobId) => api.get(`/admin/jobs/${jobId}/applications`),
 };
 
-export const bookingAPI = {
-  createBooking: (data) => api.post('/bookings', data),
-  getMyBookings: () => api.get('/bookings/my-bookings'),
-};
-
 export const servicesAPI = {
   getAll: (params) => api.get('/services', { params }),
   getById: (id) => api.get(`/services/${id}`),
@@ -105,8 +112,6 @@ export const servicesAPI = {
 export const jobsAPI = {
   getOpenJobs: (params) => api.get('/jobs', { params }),
   getJobById: (id) => api.get(`/jobs/${id}`),
-  applyForJob: (jobId, data) => api.post(`/jobs/${jobId}/apply`, data),
-  getMyApplications: () => api.get('/jobs/my-applications'),
 };
 
 export default api;

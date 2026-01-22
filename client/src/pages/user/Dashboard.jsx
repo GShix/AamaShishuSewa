@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { bookingAPI, servicesAPI, jobsAPI } from '../../utils/api';
+import { userAPI, servicesAPI, jobsAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
 import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
 import { 
@@ -144,7 +144,7 @@ const Dashboard = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await bookingAPI.getMyBookings();
+      const response = await userAPI.getMyBookings();
       setBookings(response.data.bookings || []);
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -173,7 +173,7 @@ const Dashboard = () => {
 
   const fetchMyApplications = async () => {
     try {
-      const response = await jobsAPI.getMyApplications();
+      const response = await userAPI.getMyApplications();
       setMyApplications(response.data.applications || []);
     } catch (error) {
       console.error('Error fetching applications:', error);
@@ -666,7 +666,7 @@ const Dashboard = () => {
 
     try {
       setApplying(true);
-      await jobsAPI.applyForJob(selectedJob.id, applicationData);
+      await userAPI.applyForJob(selectedJob.id, applicationData);
       alert(language === 'ne' ? 'आवेदन सफलतापूर्वक पेश गरियो!' : 'Application submitted successfully!');
       setSelectedJob(null);
       fetchMyApplications();
