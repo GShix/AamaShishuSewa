@@ -1,7 +1,7 @@
 // client/src/components/admin/UsersManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Edit, Trash2, Eye, UserCheck, UserX, RefreshCw } from 'lucide-react';
-import axios from 'axios';
+import { adminAPI } from '../../utils/api';
 
 const UsersManagement = () => {
   const [users, setUsers] = useState([]);
@@ -18,18 +18,15 @@ const UsersManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const params = new URLSearchParams({
+      const params = {
         page: pagination.page,
         limit: pagination.limit,
         ...(filterRole && { role: filterRole }),
         ...(filterStatus && { status: filterStatus }),
         ...(searchTerm && { search: searchTerm })
-      });
+      };
 
-      const response = await axios.get(`/api/admin/users?${params}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await adminAPI.getUsers(params);
 
       setUsers(response.data.users || []);
       setPagination(prev => ({ ...prev, ...response.data.pagination }));
@@ -45,12 +42,7 @@ const UsersManagement = () => {
     if (!confirm(`Are you sure you want to change user status to ${newStatus}?`)) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.patch(
-        `/api/admin/users/${userId}/status`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await adminAPI.updateUserStatus(userId, newStatus);
       
       alert('User status updated successfully');
       fetchUsers();
@@ -64,10 +56,7 @@ const UsersManagement = () => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`/api/admin/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await adminAPI.deleteUser(userId);
       
       alert('User deleted successfully');
       fetchUsers();
