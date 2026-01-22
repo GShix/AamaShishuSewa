@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Mail, Lock, AlertCircle, Loader, Eye, EyeOff, UserCheck, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
+import { adminAuthAPI } from '../../utils/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -47,8 +47,8 @@ const AdminLogin = () => {
     try {
       console.log('Attempting admin login with:', { email: formData.email });
       
-      // Direct API call to login endpoint using axios
-      const response = await axios.post('/api/admin/auth/login', {
+      // Use adminAuthAPI from utils/api.js which uses the correct base URL
+      const response = await adminAuthAPI.login({
         email: formData.email,
         password: formData.password
       });

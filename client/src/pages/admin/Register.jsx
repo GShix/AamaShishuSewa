@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Mail, Lock, AlertCircle, Loader, Eye, EyeOff, User, Phone, Key, CheckCircle, Crown, UserCog } from 'lucide-react';
-import axios from 'axios';
+import { adminAuthAPI } from '../../utils/api';
 
 const AdminRegister = () => {
   const navigate = useNavigate();
@@ -73,7 +73,7 @@ const AdminRegister = () => {
     setError('');
 
     try {
-      const response = await axios.post('/api/admin/auth/register', {
+      const response = await adminAuthAPI.register({
         email: formData.email,
         password: formData.password,
         fullName: formData.fullName,
