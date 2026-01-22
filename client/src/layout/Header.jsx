@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Globe, Menu, X, Heart, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,18 @@ const Header = ({ language, setLanguage, t }) => {
   const { isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
 
   // Safety check to prevent white-screen crashes if t isn't loaded yet
   if (!t) return <nav className="bg-white/90 h-20 border-b border-rose-100 sticky top-0 z-50"></nav>;
@@ -64,37 +76,83 @@ const Header = ({ language, setLanguage, t }) => {
         {/* Mobile Toggle Button */}
         <div className="md:hidden flex items-center gap-2">
           <div className="relative">
-            <button onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} className="p-2 rounded-lg text-slate-600 cursor-pointer">
-              <Globe className="w-5 h-5 hover:text-rose-300" />
+            <button 
+              onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} 
+              className="p-2 rounded-lg text-slate-600 cursor-pointer hover:bg-rose-50 transition-colors"
+            >
+              <Globe className="w-5 h-5 hover:text-rose-500" />
             </button>
             {isLangDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-white border border-rose-100 rounded-xl shadow-xl z-50 py-2">
-                <button onClick={() => { setLanguage('ne'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">नेपाली</button>
-                <button onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">English</button>
-              </div>
+              <>
+                {/* Backdrop for language dropdown */}
+                <div 
+                  className="fixed inset-0 z-30" 
+                  onClick={() => setIsLangDropdownOpen(false)}
+                ></div>
+                <div className="absolute right-0 mt-2 w-32 bg-white border border-rose-100 rounded-xl shadow-xl z-40 py-2">
+                  <button 
+                    onClick={() => { setLanguage('ne'); setIsLangDropdownOpen(false); }} 
+                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer transition-colors"
+                  >
+                    नेपाली
+                  </button>
+                  <button 
+                    onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }} 
+                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer transition-colors"
+                  >
+                    English
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className=" text-rose-600">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            className="text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
             {isMenuOpen ? <X size={28} className='cursor-pointer'/> : <Menu size={28} className='cursor-pointer'/>}
           </button>
         </div>
+
+        {/* Mobile Menu Backdrop */}
+        {isMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+            onClick={() => setIsMenuOpen(false)}
+          ></div>
+        )}
+
         {/* Mobile Menu Overlay */}
-        <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="flex flex-col p-6 space-y-2 bg-rose-200">
-            {/* Added ?. to safely access nav */}
-            {t?.nav?.filter(item => {
-              if (item.type === 'auth') return !isAuthenticated;
-              if (item.type === 'private') return isAuthenticated;
-              return true;
-            }).map((item, i) => (
-              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="text-left py-4 text-lg font-bold text-slate-700 hover:text-rose-400 border-b border-slate-50 cursor-pointer">
-                {item.name}
+        <div className={`fixed right-0 top-20 bottom-0 w-80 max-w-[85vw] bg-gradient-to-br from-rose-50 to-pink-50 z-50 transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex flex-col h-full overflow-y-auto">
+            <div className="flex flex-col p-6 space-y-1">
+              {/* Added ?. to safely access nav */}
+              {t?.nav?.filter(item => {
+                if (item.type === 'auth') return !isAuthenticated;
+                if (item.type === 'private') return isAuthenticated;
+                return true;
+              }).map((item, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => { navigate(item.path); setIsMenuOpen(false); }} 
+                  className="text-left py-4 px-4 text-lg font-bold text-slate-700 hover:text-rose-500 hover:bg-white/50 rounded-lg border-b border-rose-100/50 cursor-pointer transition-all"
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+            
+            {/* Book Service Button */}
+            <div className="mt-auto p-6">
+              <button 
+                onClick={() => { navigate('/book'); setIsMenuOpen(false); }} 
+                className="w-full py-4 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Heart className="w-5 h-5 fill-white" /> {t?.hero?.ctaBook || 'Book'}
               </button>
-            ))}
-            <button onClick={() => { navigate('/book'); setIsMenuOpen(false); }} className="mt-4 w-full py-4 bg-rose-500 text-white rounded-xl font-black shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-              <Heart className="w-5 h-5 fill-white" /> {t?.hero?.ctaBook || 'Book'}
-            </button>
+            </div>
           </div>
         </div>
 
