@@ -1,14 +1,14 @@
 // server/src/services/matchingService.js
 import { 
-  getAvailableProfessionals,
+  getAvailableEmployees,
   getConflictingBookings,
-  assignProfessionalToBooking,
+  assignEmployeeToBooking,
   calculateDistance,
-  getProfessionalById
+  getEmployeeById
 } from '../config/supabase.js';
 
 /**
- * AI-powered matching algorithm to find the best professional for a booking
+ * AI-powered matching algorithm to find the best employee for a booking
  * 
  * Scoring Algorithm (out of 100 points):
  * - Distance: 40 points (closer is better)
@@ -17,71 +17,71 @@ import {
  * - Workload: 10 points (fewer active bookings is better)
  * 
  * @param {Object} bookingData - Booking details
- * @returns {Object} Matching result with professional and alternatives
+ * @returns {Object} Matching result with employee and alternatives
  */
-export const matchProfessional = async (bookingData) => {
+export const matchEmployee = async (bookingData) => {
   try {
     const { serviceType, latitude, longitude, bookingDate } = bookingData;
 
-    console.log(`🔍 Matching professional for ${serviceType} at (${latitude}, ${longitude})`);
+    console.log(`🔍 Matching employee for ${serviceType} at (${latitude}, ${longitude})`);
 
-    // Step 1: Get available professionals within Kathmandu Valley (15km radius)
-    const availablePros = await getAvailableProfessionals(
+    // Step 1: Get available employees within Kathmandu Valley (15km radius)
+    const availableEmps = await getAvailableEmployees(
       serviceType,
       latitude,
       longitude,
       15 // 15km radius covers entire Kathmandu Valley
     );
 
-    if (availablePros.length === 0) {
+    if (availableEmps.length === 0) {
       return {
         success: false,
-        message: 'No available professionals found in your area. Please try expanding your search or contact support.',
-        messageNepali: 'तपाईंको क्षेत्रमा कुनै उपलब्ध पेशेवरहरू फेला परेनन्। कृपया आफ्नो खोज विस्तार गर्नुहोस् वा समर्थनमा सम्पर्क गर्नुहोस्।'
+        message: 'No available employees found in your area. Please try expanding your search or contact support.',
+        messageNepali: 'तपाईंको क्षेत्रमा कुनै उपलब्ध कर्मचारीहरू फेला परेनन्। कृपया आफ्नो खोज विस्तार गर्नुहोस् वा समर्थनमा सम्पर्क गर्नुहोस्।'
       };
     }
 
-    console.log(`✅ Found ${availablePros.length} available professionals`);
+    console.log(`✅ Found ${availableEmps.length} available employees`);
 
     // Step 2: Check for booking conflicts on the requested date
     const dateStr = new Date(bookingDate).toISOString().split('T')[0];
     const conflictChecks = await Promise.all(
-      availablePros.map(async (pro) => {
-        const conflicts = await getConflictingBookings(pro.id, dateStr);
+      availableEmps.map(async (emp) => {
+        const conflicts = await getConflictingBookings(emp.id, dateStr);
         return {
-          proId: pro.id,
+          empId: emp.id,
           hasConflict: conflicts.length > 0
         };
       })
     );
 
-    // Filter out busy professionals
-    const busyProIds = new Set(
+    // Filter out busy employees
+    const busyEmpIds = new Set(
       conflictChecks
         .filter(check => check.hasConflict)
-        .map(check => check.proId)
+        .map(check => check.empId)
     );
 
-    const freePros = availablePros.filter(p => !busyProIds.has(p.id));
+    const freeEmps = availableEmps.filter(e => !busyEmpIds.has(e.id));
 
-    if (freePros.length === 0) {
+    if (freeEmps.length === 0) {
       return {
         success: false,
-        message: 'All professionals are booked on this date. Please choose another date or contact us for assistance.',
-        messageNepali: 'यस मितिमा सबै पेशेवरहरू बुक छन्। कृपया अर्को मिति छान्नुहोस् वा सहयोगको लागि हामीलाई सम्पर्क गर्नुहोस्।',
+        message: 'All employees are booked on this date. Please choose another date or contact us for assistance.',
+        messageNepali: 'यस मितिमा सबै कर्मचारीहरू बुक छन्। कृपया अर्को मिति छान्नुहोस् वा सहयोगको लागि हामीलाई सम्पर्क गर्नुहोस्।',
         availableDates: getNextAvailableDates(bookingDate)
       };
     }
 
-    console.log(`✅ ${freePros.length} professionals free on ${dateStr}`);
+    console.log(`✅ ${freeEmps.length} employees free on ${dateStr}`);
 
-    // Step 3: Score each professional using AI algorithm
-    const scoredPros = freePros.map(pro => {
+    // Step 3: Score each employee using AI algorithm
+    const scoredEmps = freeEmps.map(emp => {
       const distance = calculateDistance(
         latitude,
         longitude,
-        pro.latitude,
-        pro.longitude
+        emp.latitude,
+        emp.longitude
       );
 
       // Scoring algorithm (max 100 points)
@@ -104,15 +104,15 @@ export const matchProfessional = async (bookingData) => {
       }
 
       // Rating score (30 points max) - Quality of service
-      const ratingScore = (pro.rating / 5) * 30;
+      const ratingScore = (emp.rating / 5) * 30;
       score += ratingScore;
       scoreBreakdown.rating = { 
         points: Math.round(ratingScore), 
-        reason: `Rating: ${pro.rating}/5.0` 
+        reason: `Rating: ${emp.rating}/5.0` 
       };
 
       // Experience score (20 points max) - Years of experience
-      const expYears = pro.experience_years || 0;
+      const expYears = emp.experience_years || 0;
       let expScore = 0;
       if (expYears >= 10) {
         expScore = 20;
@@ -132,7 +132,7 @@ export const matchProfessional = async (bookingData) => {
       // Workload score (10 points max) - Based on total reviews as proxy
       // More reviews = more experience but potentially busier
       // Optimal balance: 20-50 reviews
-      const totalReviews = pro.total_reviews || 0;
+      const totalReviews = emp.total_reviews || 0;
       let workloadScore = 10;
       if (totalReviews >= 50) {
         workloadScore = 8; // Very busy but experienced
@@ -145,18 +145,18 @@ export const matchProfessional = async (bookingData) => {
         scoreBreakdown.workload = { points: 9, reason: 'Good experience (10-20 reviews)' };
       } else {
         workloadScore = 7; // New but available
-        scoreBreakdown.workload = { points: 7, reason: 'Newer professional' };
+        scoreBreakdown.workload = { points: 7, reason: 'Newer employee' };
       }
       score += workloadScore;
 
       // Bonus points for multiple specializations (versatile)
-      if (pro.specialization && pro.specialization.length > 1) {
+      if (emp.specialization && emp.specialization.length > 1) {
         score += 5;
         scoreBreakdown.versatility = { points: 5, reason: 'Multiple specializations' };
       }
 
       return {
-        ...pro,
+        ...emp,
         distance: parseFloat(distance.toFixed(2)),
         matchScore: Math.round(score),
         scoreBreakdown,
@@ -165,17 +165,17 @@ export const matchProfessional = async (bookingData) => {
     });
 
     // Step 4: Sort by score (highest first)
-    scoredPros.sort((a, b) => b.matchScore - a.matchScore);
+    scoredEmps.sort((a, b) => b.matchScore - a.matchScore);
 
     // Get best match and alternatives
-    const bestMatch = scoredPros[0];
-    const alternatives = scoredPros.slice(1, 4); // Top 3 alternatives
+    const bestMatch = scoredEmps[0];
+    const alternatives = scoredEmps.slice(1, 4); // Top 3 alternatives
 
     console.log(`✅ Best match: ${bestMatch.full_name} (Score: ${bestMatch.matchScore}/100)`);
 
     return {
       success: true,
-      professional: bestMatch,
+      employee: bestMatch,
       alternatives,
       message: `Best match found: ${bestMatch.full_name} (${bestMatch.distance}km away)`,
       messageNepali: `उत्तम मिलान फेला पर्यो: ${bestMatch.full_name} (${bestMatch.distance}km टाढा)`,
@@ -186,22 +186,22 @@ export const matchProfessional = async (bookingData) => {
     console.error('❌ Matching error:', error);
     return {
       success: false,
-      message: 'Failed to match professional. Please try again or contact support.',
-      messageNepali: 'पेशेवर मिलाउन असफल। कृपया पुन: प्रयास गर्नुहोस् वा समर्थनमा सम्पर्क गर्नुहोस्।',
+      message: 'Failed to match employee. Please try again or contact support.',
+      messageNepali: 'कर्मचारी मिलाउन असफल। कृपया पुन: प्रयास गर्नुहोस् वा समर्थनमा सम्पर्क गर्नुहोस्।',
       error: error.message
     };
   }
 };
 
 /**
- * Auto-assign professional to a booking
+ * Auto-assign employee to a booking
  * 
  * @param {string} bookingId - Booking ID
  * @returns {Object} Assignment result
  */
-export const autoAssignProfessional = async (bookingId) => {
+export const autoAssignEmployee = async (bookingId) => {
   try {
-    console.log(`🤖 Auto-assigning professional to booking: ${bookingId}`);
+    console.log(`🤖 Auto-assigning employee to booking: ${bookingId}`);
 
     // Import here to avoid circular dependency
     const { getBookingById } = await import('../config/supabase.js');
@@ -216,13 +216,13 @@ export const autoAssignProfessional = async (bookingId) => {
     if (booking.employee_id) {
       return {
         success: false,
-        message: 'Booking already has a professional assigned',
-        messageNepali: 'बुकिङमा पहिले नै पेशेवर नियुक्त गरिएको छ'
+        message: 'Booking already has an employee assigned',
+        messageNepali: 'बुकिङमा पहिले नै कर्मचारी नियुक्त गरिएको छ'
       };
     }
 
     // Find best match
-    const matchResult = await matchProfessional({
+    const matchResult = await matchEmployee({
       serviceType: booking.service_type,
       latitude: booking.latitude,
       longitude: booking.longitude,
@@ -233,25 +233,25 @@ export const autoAssignProfessional = async (bookingId) => {
       return matchResult;
     }
 
-    // Assign professional to booking
-    const updatedBooking = await assignProfessionalToBooking(
+    // Assign employee to booking
+    const updatedBooking = await assignEmployeeToBooking(
       bookingId,
-      matchResult.professional.id
+      matchResult.employee.id
     );
 
     if (!updatedBooking) {
-      throw new Error('Failed to assign professional');
+      throw new Error('Failed to assign employee');
     }
 
-    console.log(`✅ Professional assigned successfully`);
+    console.log(`✅ Employee assigned successfully`);
 
     return {
       success: true,
       booking: updatedBooking,
-      professional: matchResult.professional,
-      message: `Professional ${matchResult.professional.full_name} assigned successfully`,
-      messageNepali: `पेशेवर ${matchResult.professional.full_name} सफलतापूर्वक नियुक्त गरियो`,
-      matchScore: matchResult.professional.matchScore,
+      employee: matchResult.employee,
+      message: `Employee ${matchResult.employee.full_name} assigned successfully`,
+      messageNepali: `कर्मचारी ${matchResult.employee.full_name} सफलतापूर्वक नियुक्त गरियो`,
+      matchScore: matchResult.employee.matchScore,
       matchQuality: matchResult.matchQuality
     };
 
@@ -259,56 +259,56 @@ export const autoAssignProfessional = async (bookingId) => {
     console.error('❌ Auto-assign error:', error);
     return {
       success: false,
-      message: 'Failed to auto-assign professional. Please try manual assignment.',
-      messageNepali: 'पेशेवर स्वचालित रूपमा नियुक्त गर्न असफल। कृपया म्यानुअल नियुक्ति प्रयास गर्नुहोस्।',
+      message: 'Failed to auto-assign employee. Please try manual assignment.',
+      messageNepali: 'कर्मचारी स्वचालित रूपमा नियुक्त गर्न असफल। कृपया म्यानुअल नियुक्ति प्रयास गर्नुहोस्।',
       error: error.message
     };
   }
 };
 
 /**
- * Manual professional assignment (for admin)
+ * Manual employee assignment (for admin)
  * 
  * @param {string} bookingId - Booking ID
- * @param {string} professionalId - Professional ID
+ * @param {string} employeeId - Employee ID
  * @returns {Object} Assignment result
  */
-export const manualAssignProfessional = async (bookingId, professionalId) => {
+export const manualAssignEmployee = async (bookingId, employeeId) => {
   try {
-    console.log(`👤 Manual assignment: Booking ${bookingId} → Professional ${professionalId}`);
+    console.log(`👤 Manual assignment: Booking ${bookingId} → Employee ${employeeId}`);
 
-    // Check if professional exists and is available
-    const professional = await getProfessionalById(professionalId);
+    // Check if employee exists and is available
+    const employee = await getEmployeeById(employeeId);
     
-    if (!professional) {
+    if (!employee) {
       return {
         success: false,
-        message: 'Professional not found',
-        messageNepali: 'पेशेवर फेला परेन'
+        message: 'Employee not found',
+        messageNepali: 'कर्मचारी फेला परेन'
       };
     }
 
-    if (professional.verification_status !== 'verified') {
+    if (employee.verification_status !== 'verified') {
       return {
         success: false,
-        message: 'Professional is not verified',
-        messageNepali: 'पेशेवर प्रमाणित छैन'
+        message: 'Employee is not verified',
+        messageNepali: 'कर्मचारी प्रमाणित छैन'
       };
     }
 
-    if (professional.availability_status !== 'available') {
+    if (employee.availability_status !== 'available') {
       return {
         success: false,
-        message: 'Professional is not available',
-        messageNepali: 'पेशेवर उपलब्ध छैन'
+        message: 'Employee is not available',
+        messageNepali: 'कर्मचारी उपलब्ध छैन'
       };
     }
 
-    // Assign professional
-    const updatedBooking = await assignProfessionalToBooking(bookingId, professionalId);
+    // Assign employee
+    const updatedBooking = await assignEmployeeToBooking(bookingId, employeeId);
 
     if (!updatedBooking) {
-      throw new Error('Failed to assign professional');
+      throw new Error('Failed to assign employee');
     }
 
     console.log(`✅ Manual assignment successful`);
@@ -316,17 +316,17 @@ export const manualAssignProfessional = async (bookingId, professionalId) => {
     return {
       success: true,
       booking: updatedBooking,
-      professional,
-      message: `Professional ${professional.full_name} assigned successfully`,
-      messageNepali: `पेशेवर ${professional.full_name} सफलतापूर्वक नियुक्त गरियो`
+      employee,
+      message: `Employee ${employee.full_name} assigned successfully`,
+      messageNepali: `कर्मचारी ${employee.full_name} सफलतापूर्वक नियुक्त गरियो`
     };
 
   } catch (error) {
     console.error('❌ Manual assign error:', error);
     return {
       success: false,
-      message: 'Failed to assign professional',
-      messageNepali: 'पेशेवर नियुक्त गर्न असफल',
+      message: 'Failed to assign employee',
+      messageNepali: 'कर्मचारी नियुक्त गर्न असफल',
       error: error.message
     };
   }
@@ -343,11 +343,11 @@ const getMatchReason = (scoreBreakdown, distance) => {
   }
   
   if (scoreBreakdown.rating && scoreBreakdown.rating.points >= 25) {
-    reasons.push('Highly rated professional');
+    reasons.push('Highly rated employee');
   }
   
   if (scoreBreakdown.experience && scoreBreakdown.experience.points >= 15) {
-    reasons.push('Experienced professional');
+    reasons.push('Experienced employee');
   }
   
   if (scoreBreakdown.versatility) {
@@ -409,9 +409,9 @@ const getNextAvailableDates = (currentDate) => {
 };
 
 /**
- * Get professionals by service type (for search/filter)
+ * Get employees by service type (for search/filter)
  */
-export const searchProfessionals = async (filters = {}) => {
+export const searchEmployees = async (filters = {}) => {
   try {
     const {
       serviceType,
@@ -422,7 +422,7 @@ export const searchProfessionals = async (filters = {}) => {
       minExperience = 0
     } = filters;
 
-    let professionals = await getAvailableProfessionals(
+    let employees = await getAvailableEmployees(
       serviceType,
       latitude || 27.7172, // Default Kathmandu
       longitude || 85.3240,
@@ -430,25 +430,25 @@ export const searchProfessionals = async (filters = {}) => {
     );
 
     // Apply additional filters
-    professionals = professionals.filter(pro => {
-      if (minRating && pro.rating < minRating) return false;
-      if (minExperience && pro.experience_years < minExperience) return false;
+    employees = employees.filter(emp => {
+      if (minRating && emp.rating < minRating) return false;
+      if (minExperience && emp.experience_years < minExperience) return false;
       return true;
     });
 
-    // Add distance to each professional
-    professionals = professionals.map(pro => ({
-      ...pro,
+    // Add distance to each employee
+    employees = employees.map(emp => ({
+      ...emp,
       distance: calculateDistance(
         latitude || 27.7172,
         longitude || 85.3240,
-        pro.latitude,
-        pro.longitude
+        emp.latitude,
+        emp.longitude
       ).toFixed(2)
     }));
 
     // Sort by rating then distance
-    professionals.sort((a, b) => {
+    employees.sort((a, b) => {
       if (b.rating !== a.rating) {
         return b.rating - a.rating;
       }
@@ -457,22 +457,33 @@ export const searchProfessionals = async (filters = {}) => {
 
     return {
       success: true,
-      professionals,
-      count: professionals.length
+      employees,
+      count: employees.length
     };
 
   } catch (error) {
-    console.error('Search professionals error:', error);
+    console.error('Search employees error:', error);
     return {
       success: false,
-      professionals: [],
+      employees: [],
       count: 0,
       error: error.message
     };
   }
 };
 
+// Backward compatibility aliases (deprecated - use employee versions)
+export const matchProfessional = matchEmployee;
+export const autoAssignProfessional = autoAssignEmployee;
+export const manualAssignProfessional = manualAssignEmployee;
+export const searchProfessionals = searchEmployees;
+
 export default {
+  matchEmployee,
+  autoAssignEmployee,
+  manualAssignEmployee,
+  searchEmployees,
+  // Backward compatibility (deprecated)
   matchProfessional,
   autoAssignProfessional,
   manualAssignProfessional,

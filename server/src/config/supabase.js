@@ -112,20 +112,20 @@ export const getUserByIdentifier = async (identifier) => {
 };
 
 /**
- * Get professional by ID
+ * Get employee by ID
  */
-export const getProfessionalById = async (profId) => {
+export const getEmployeeById = async (empId) => {
   try {
     const { data, error } = await supabaseAdmin
-      .from('professionals')
+      .from('employees')
       .select('*')
-      .eq('id', profId)
+      .eq('id', empId)
       .single();
     
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Get professional error:', error);
+    console.error('Get employee error:', error);
     return null;
   }
 };
@@ -142,7 +142,7 @@ export const getBookingById = async (bookingId) => {
         users:user_id (
           id, full_name, email, phone, address
         ),
-        professionals:employee_id (
+        employees:employee_id (
           id, full_name, phone, email, rating, 
           specialization, experience_years, bio
         ),
@@ -160,18 +160,10 @@ export const getBookingById = async (bookingId) => {
   }
 };
 
-/**
- * Get available professionals by service type and location
- * @param {string} serviceType - postpartum, massage, or nwaran
- * @param {number} latitude - Client latitude
- * @param {number} longitude - Client longitude
- * @param {number} radius - Search radius in kilometers (default 15km)
- * @returns {Array} List of available professionals
- */
-export const getAvailableProfessionals = async (serviceType, latitude, longitude, radius = 15) => {
+export const getAvailableEmployees = async (serviceType, latitude, longitude, radius = 15) => {
   try {
     const { data, error } = await supabaseAdmin
-      .from('professionals')
+      .from('employees')
       .select('*')
       .contains('specialization', [serviceType])
       .eq('verification_status', 'verified')
@@ -180,37 +172,37 @@ export const getAvailableProfessionals = async (serviceType, latitude, longitude
     if (error) throw error;
     
     // Filter by distance (Haversine formula)
-    const filtered = data.filter(prof => {
+    const filtered = data.filter(emp => {
       const distance = calculateDistance(
         latitude, 
         longitude,
-        prof.latitude, 
-        prof.longitude
+        emp.latitude, 
+        emp.longitude
       );
       return distance <= radius;
     });
     
     return filtered;
   } catch (error) {
-    console.error('Get available professionals error:', error);
+    console.error('Get available employees error:', error);
     return [];
   }
 };
 
 /**
- * Get all professionals (for admin)
+ * Get all employees (for admin)
  */
-export const getAllProfessionals = async () => {
+export const getAllEmployees = async () => {
   try {
     const { data, error } = await supabaseAdmin
-      .from('professionals')
+      .from('employees')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Get all professionals error:', error);
+    console.error('Get all employees error:', error);
     return [];
   }
 };
@@ -224,7 +216,7 @@ export const getUserBookings = async (userId) => {
       .from('bookings')
       .select(`
         *,
-        professionals:employee_id (
+        employees:employee_id (
           id, full_name, phone, rating, specialization
         ),
         nwaran_details (*),
@@ -242,9 +234,9 @@ export const getUserBookings = async (userId) => {
 };
 
 /**
- * Get professional bookings
+ * Get employee bookings
  */
-export const getProfessionalBookings = async (professionalId) => {
+export const getEmployeeBookings = async (employeeId) => {
   try {
     const { data, error } = await supabaseAdmin
       .from('bookings')
@@ -255,28 +247,28 @@ export const getProfessionalBookings = async (professionalId) => {
         ),
         nwaran_details (*)
       `)
-      .eq('employee_id', professionalId)
+      .eq('employee_id', employeeId)
       .order('booking_date', { ascending: true });
     
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Get professional bookings error:', error);
+    console.error('Get employee bookings error:', error);
     return [];
   }
 };
 
 /**
- * Get conflicting bookings for a professional on a specific date
+ * Get conflicting bookings for an employee on a specific date
  */
-export const getConflictingBookings = async (professionalId, bookingDate) => {
+export const getConflictingBookings = async (employeeId, bookingDate) => {
   try {
     const dateStr = new Date(bookingDate).toISOString().split('T')[0];
     
     const { data, error } = await supabaseAdmin
       .from('bookings')
       .select('id, booking_date, status')
-      .eq('employee_id', professionalId)
+      .eq('employee_id', employeeId)
       .eq('booking_date', dateStr)
       .in('status', ['confirmed', 'in_progress']);
     
@@ -312,14 +304,14 @@ export const updateBookingStatus = async (bookingId, status) => {
 };
 
 /**
- * Assign professional to booking
+ * Assign employee to booking
  */
-export const assignProfessionalToBooking = async (bookingId, professionalId) => {
+export const assignEmployeeToBooking = async (bookingId, employeeId) => {
   try {
     const { data, error } = await supabaseAdmin
       .from('bookings')
       .update({ 
-        employee_id: professionalId,
+        employee_id: employeeId,
         status: 'confirmed',
         updated_at: new Date()
       })
@@ -330,7 +322,7 @@ export const assignProfessionalToBooking = async (bookingId, professionalId) => 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Assign professional error:', error);
+    console.error('Assign employee error:', error);
     return null;
   }
 };
@@ -387,16 +379,7 @@ export const getCarePlan = async (bookingId) => {
 
 // ============================================================================
 // DISTANCE CALCULATION (Haversine Formula)
-// ============================================================================
-
-/**
- * Calculate distance between two coordinates in kilometers
- * @param {number} lat1 - First latitude
- * @param {number} lon1 - First longitude
- * @param {number} lat2 - Second latitude
- * @param {number} lon2 - Second longitude
- * @returns {number} Distance in kilometers
- */
+// 
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRad(lat2 - lat1);
@@ -434,9 +417,9 @@ export const getDashboardStats = async () => {
       .from('users')
       .select('*', { count: 'exact', head: true });
     
-    // Total professionals
-    const { count: totalProfessionals } = await supabaseAdmin
-      .from('professionals')
+    // Total employees
+    const { count: totalEmployees } = await supabaseAdmin
+      .from('employees')
       .select('*', { count: 'exact', head: true })
       .eq('verification_status', 'verified');
     
@@ -459,7 +442,7 @@ export const getDashboardStats = async () => {
     
     return {
       totalUsers: totalUsers || 0,
-      totalProfessionals: totalProfessionals || 0,
+      totalEmployees: totalEmployees || 0,
       totalBookings: totalBookings || 0,
       pendingBookings: pendingBookings || 0,
       completedBookings: completedBookings || 0
@@ -468,7 +451,7 @@ export const getDashboardStats = async () => {
     console.error('Get dashboard stats error:', error);
     return {
       totalUsers: 0,
-      totalProfessionals: 0,
+      totalEmployees: 0,
       totalBookings: 0,
       pendingBookings: 0,
       completedBookings: 0
@@ -476,26 +459,36 @@ export const getDashboardStats = async () => {
   }
 };
 
-// ============================================================================
-// EXPORTS
-// ============================================================================
+
+// Backward compatibility aliases (deprecated - use employee versions)
+export const getProfessionalById = getEmployeeById;
+export const getAvailableProfessionals = getAvailableEmployees;
+export const getAllProfessionals = getAllEmployees;
+export const getProfessionalBookings = getEmployeeBookings;
+export const assignProfessionalToBooking = assignEmployeeToBooking;
 
 export default {
   supabaseAdmin,
   supabaseClient,
   getUserById,
   getUserByIdentifier,
-  getProfessionalById,
+  getEmployeeById,
   getBookingById,
-  getAvailableProfessionals,
-  getAllProfessionals,
+  getAvailableEmployees,
+  getAllEmployees,
   getUserBookings,
-  getProfessionalBookings,
+  getEmployeeBookings,
   getConflictingBookings,
   updateBookingStatus,
-  assignProfessionalToBooking,
+  assignEmployeeToBooking,
   createCarePlan,
   getCarePlan,
   calculateDistance,
-  getDashboardStats
+  getDashboardStats,
+  // Backward compatibility (deprecated)
+  getProfessionalById,
+  getAvailableProfessionals,
+  getAllProfessionals,
+  getProfessionalBookings,
+  assignProfessionalToBooking
 };

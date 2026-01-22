@@ -170,7 +170,7 @@ export const generateNotification = async (bookingId, notificationType) => {
       throw new Error('Booking not found');
     }
 
-    const professional = booking.professionals;
+    const employee = booking.employees;
     const client = booking.users;
 
     // Use template notifications if OpenAI not available
@@ -178,7 +178,7 @@ export const generateNotification = async (bookingId, notificationType) => {
       const templateNotif = getTemplateNotification(
         booking,
         client,
-        professional,
+        employee,
         notificationType
       );
       return {
@@ -190,7 +190,7 @@ export const generateNotification = async (bookingId, notificationType) => {
     const context = buildNotificationContext(
       booking,
       client,
-      professional,
+      employee,
       notificationType
     );
 
@@ -248,13 +248,13 @@ export const generateNotification = async (bookingId, notificationType) => {
     // Fallback to template
     try {
       const booking = await getBookingById(bookingId);
-      const professional = booking?.professionals;
+      const employee = booking?.employees;
       const client = booking?.users;
       
       const templateNotif = getTemplateNotification(
         booking,
         client,
-        professional,
+        employee,
         notificationType
       );
       
@@ -424,7 +424,7 @@ Create a care plan in JSON format with this structure:
 `;
 };
 
-const buildNotificationContext = (booking, client, professional, type) => {
+const buildNotificationContext = (booking, client, employee, type) => {
   const serviceNames = {
     postpartum: 'सुत्केरी हेरचाह',
     massage: 'मालिश',
@@ -448,10 +448,10 @@ Keep it under 160 characters. Be polite and professional.`;
       return `Generate a WhatsApp confirmation in Nepali for a client.
 
 Details:
-- Professional: ${professional?.full_name}
+- Employee: ${employee?.full_name}
 - Service: ${serviceNames[booking.service_type]}
 - Date: ${booking.booking_date}
-- Contact: ${professional?.phone}
+- Contact: ${employee?.phone}
 
 Include reassurance and next steps.`;
 

@@ -14,7 +14,7 @@ router.get('/my-bookings', authenticate, async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        professionals:employee_id (
+        employees:employee_id (
           id,
           full_name,
           phone,
@@ -95,7 +95,7 @@ router.get('/:id', authenticate, async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        professionals:employee_id (
+        employees:employee_id (
           id,
           full_name,
           phone,

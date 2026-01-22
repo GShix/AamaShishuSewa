@@ -112,7 +112,7 @@ export const getUserBookings = async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        professionals:employee_id (
+        employees:employee_id (
           id, full_name, phone, rating, specialization
         ),
         nwaran_details (*),
@@ -144,7 +144,7 @@ export const getBookingById = async (req, res) => {
       .select(`
         *,
         users:user_id (id, full_name, phone, email, address),
-        professionals:employee_id (
+        employees:employee_id (
           id, full_name, phone, email, rating, 
           specialization, experience_years
         ),
