@@ -61,72 +61,45 @@ const Header = ({ language, setLanguage, t }) => {
             {language === 'ne' ? 'ENGLISH' : 'नेपाली'}
           </button>
         </div>
-
-        {/* Mobile Section - Menu with navigation */}
+        {/* Mobile Toggle Button */}
         <div className="md:hidden flex items-center gap-2">
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)} 
-            className="p-2 rounded-lg text-slate-600 cursor-pointer hover:bg-rose-50 transition"
-          >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="relative">
+            <button onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)} className="p-2 rounded-lg text-slate-600 cursor-pointer">
+              <Globe className="w-5 h-5 hover:text-rose-300" />
+            </button>
+            {isLangDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-32 bg-white border border-rose-100 rounded-xl shadow-xl z-50 py-2">
+                <button onClick={() => { setLanguage('ne'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">नेपाली</button>
+                <button onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-rose-50 cursor-pointer">English</button>
+              </div>
+            )}
+          </div>
 
-          {/* Login/Profile Button */}
-          {!isAuthenticated ? (
-            <button 
-              onClick={() => navigate('/login')} 
-              className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition shadow-md cursor-pointer"
-            >
-              <UserCircle className="w-4 h-4" />
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className=" text-rose-600">
+            {isMenuOpen ? <X size={28} className='cursor-pointer'/> : <Menu size={28} className='cursor-pointer'/>}
+          </button>
+        </div>
+        {/* Mobile Menu Overlay */}
+        <div className={`fixed inset-0 top-20 bg-white z-40 transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex flex-col p-6 space-y-2 bg-rose-200">
+            {/* Added ?. to safely access nav */}
+            {t?.nav?.filter(item => {
+              if (item.type === 'auth') return !isAuthenticated;
+              if (item.type === 'private') return isAuthenticated;
+              return true;
+            }).map((item, i) => (
+              <button key={i} onClick={() => { navigate(item.path); setIsMenuOpen(false); }} className="text-left py-4 text-lg font-bold text-slate-700 hover:text-rose-400 border-b border-slate-50 cursor-pointer">
+                {item.name}
+              </button>
+            ))}
+            <button onClick={() => { navigate('/book'); setIsMenuOpen(false); }} className="mt-4 w-full py-4 bg-rose-500 text-white rounded-xl font-black shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+              <Heart className="w-5 h-5 fill-white" /> {t?.hero?.ctaBook || 'Book'}
             </button>
-          ) : (
-            <button 
-              onClick={() => navigate('/dashboard')} 
-              className="w-9 h-9 bg-gradient-to-br from-rose-400 to-rose-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md cursor-pointer hover:shadow-lg transition"
-              title="Dashboard"
-            >
-              {isAuthenticated?.user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
-            </button>
-          )}
+          </div>
         </div>
 
-        {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <div className="absolute top-20 left-0 right-0 bg-white border-t border-gray-200 shadow-xl md:hidden z-40">
-            <nav className="flex flex-col">
-              {filteredNav?.map((item, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    navigate(item.path);
-                    setIsMenuOpen(false);
-                  }}
-                  className="px-6 py-4 text-left text-sm font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition border-b border-gray-100 cursor-pointer"
-                >
-                  {item.name}
-                </button>
-              ))}
-              
-              {/* Language Toggle in Menu */}
-              <div className="px-6 py-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    setLanguage(language === 'ne' ? 'en' : 'ne');
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-xs font-black text-slate-700 hover:bg-white transition-all cursor-pointer w-full justify-center"
-                >
-                  <Globe className="w-3.5 h-3.5 text-rose-500" />
-                  {language === 'ne' ? 'ENGLISH' : 'नेपाली'}
-                </button>
-              </div>
-            </nav>
-          </div>
-        )}
       </div>
 
-      {/* Mobile Menu Overlay - Removed (using bottom nav instead) */}
     </nav>
   );
 };
