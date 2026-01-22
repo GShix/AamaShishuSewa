@@ -1,12 +1,18 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Briefcase, Calendar, UserCircle, Phone, Info, Users, Newspaper } from 'lucide-react';
+import { Home, Briefcase, Calendar, UserCircle, Phone, Info, Users, Newspaper, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const UserMobileBottomNav = ({ t, language }) => {
+const UserMobileBottomNav = ({ t, language, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
+  };
 
   // User dashboard navigation items
   const navItems = [
@@ -44,11 +50,11 @@ const UserMobileBottomNav = ({ t, language }) => {
       inactiveColor: 'text-slate-400'
     },
     { 
-      id: 'contact',
-      icon: Phone, 
-      label: language === 'ne' ? 'सम्पर्क' : 'Contact', 
-      path: '/contact',
-      activeColor: 'text-rose-600',
+      id: 'logout',
+      icon: LogOut, 
+      label: language === 'ne' ? 'बाहिर' : 'Logout', 
+      action: 'logout',
+      activeColor: 'text-red-600',
       inactiveColor: 'text-slate-400'
     },
   ];
@@ -94,7 +100,7 @@ const UserMobileBottomNav = ({ t, language }) => {
             return (
               <button
                 key={item.id}
-                onClick={() => navigate(item.path)}
+                onClick={() => item.action === 'logout' ? handleLogout() : navigate(item.path)}
                 className={`flex flex-col items-center justify-center py-2 px-3 transition-all duration-200 active:scale-95 ${
                   active ? 'scale-105' : 'scale-100'
                 }`}

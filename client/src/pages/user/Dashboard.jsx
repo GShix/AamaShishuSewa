@@ -647,11 +647,11 @@ const Dashboard = () => {
               navigate('/');
               setMobileMenuOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-all touch-manipulation ${!sidebarOpen && 'justify-center'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all touch-manipulation ${!sidebarOpen && 'justify-center'}`}
             title={!sidebarOpen ? (language === 'ne' ? 'होमपेज' : 'Go to Homepage') : ''}
           >
             <Home className="w-5 h-5" />
-            {sidebarOpen && <span className="text-sm font-medium">{language === 'ne' ? 'होमपेज' : 'Homepage'}</span>}
+            {sidebarOpen && <span className="text-sm font-semibold">{language === 'ne' ? 'होमपेज जानुहोस्' : 'Return to Home'}</span>}
           </button>
           
           <button
@@ -753,7 +753,8 @@ const Dashboard = () => {
         {/* Mobile Bottom Navigation */}
         <UserMobileBottomNav 
           t={{ nav: menuItems }} 
-          language={language} 
+          language={language}
+          onLogout={handleLogout}
         />
       </div>
     </div>

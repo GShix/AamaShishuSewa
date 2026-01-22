@@ -8,6 +8,11 @@ const MobileBottomNav = ({ t, language }) => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
+  // Hide bottom nav in dashboard (has its own UserMobileBottomNav)
+  if (location.pathname === '/dashboard') {
+    return null;
+  }
+
   // Define navigation items - Always show login/profile for better UX
   const navItems = [
     { 
