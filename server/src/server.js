@@ -23,8 +23,9 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: [
-    // process.env.CLIENT_URL || 'http://localhost:5173',
-    'https://aama-shishu-sewa.vercel.app/'
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'https://aama-shishu-sewa.vercel.app',
+    'https://aamashishusewa.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
@@ -33,6 +34,9 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Health check
 app.get('/', (req, res) => {
