@@ -84,7 +84,7 @@ const Header = ({ language, setLanguage, t }) => {
               className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition shadow-md cursor-pointer"
             >
               <UserCircle className="w-4 h-4" />
-              {language === 'ne' ? 'लगइन' : 'Login'}
+              {/* {language === 'ne' ? 'लगइन' : 'Login'} */}
             </button>
           ) : (
             <button 

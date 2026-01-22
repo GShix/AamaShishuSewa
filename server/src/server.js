@@ -23,7 +23,7 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173',
+    // process.env.CLIENT_URL || 'http://localhost:5173',
     'https://aama-shishu-sewa.vercel.app/'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'आमा शिशु सेवा API Running' });
 });
 
