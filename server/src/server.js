@@ -44,7 +44,19 @@ app.options('*', cors());
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'आमा शिशु सेवा API Running' });
+  res.json({ 
+    status: 'ok', 
+    message: 'आमा शिशु सेवा API Running',
+    version: '1.0.1',
+    timestamp: new Date().toISOString(),
+    routes: {
+      auth: '/api/auth',
+      bookings: '/api/bookings',
+      services: '/api/services',
+      jobs: '/api/jobs',
+      admin: '/api/admin'
+    }
+  });
 });
 
 // Routes
