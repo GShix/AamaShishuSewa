@@ -1,13 +1,19 @@
 // client/src/components/admin/JobsManagement.jsx
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, RefreshCw, X, Briefcase, MapPin, Clock, Users, Calendar, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, X, Briefcase, MapPin, Clock, Users, Calendar, DollarSign, FileText, Mail, Phone, ExternalLink, Eye, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { adminAPI } from '../../utils/api';
 
 const JobsManagement = () => {
+  const [activeTab, setActiveTab] = useState('jobs'); // 'jobs' or 'applications'
   const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [applicationStats, setApplicationStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
   const [formData, setFormData] = useState({
     title: '',
     department: '',
@@ -26,6 +32,8 @@ const JobsManagement = () => {
 
   useEffect(() => {
     fetchJobs();
+    fetchApplications();
+    fetchApplicationStats();
   }, []);
 
   const fetchJobs = async () => {
@@ -40,6 +48,32 @@ const JobsManagement = () => {
       setLoading(false);
     }
   };
+
+  const fetchApplications = async () => {
+    try {
+      const params = filterStatus !== 'all' ? { status: filterStatus } : {};
+      const response = await adminAPI.getAllJobApplications(params);
+      setApplications(response.data.applications || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      setApplications([]);
+    }
+  };
+
+  const fetchApplicationStats = async () => {
+    try {
+      const response = await adminAPI.getJobApplicationStats();
+      setApplicationStats(response.data.stats);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'applications') {
+      fetchApplications();
+    }
+  }, [filterStatus, activeTab]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,6 +155,39 @@ const JobsManagement = () => {
     });
   };
 
+  const handleViewApplication = (application) => {
+    setSelectedApplication(application);
+    setShowApplicationModal(true);
+  };
+
+  const handleUpdateApplicationStatus = async (applicationId, newStatus) => {
+    try {
+      await adminAPI.updateApplicationStatus(applicationId, newStatus);
+      alert(`Application ${newStatus} successfully`);
+      fetchApplications();
+      fetchApplicationStats();
+      setShowApplicationModal(false);
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      alert('Failed to update application status');
+    }
+  };
+
+  const handleDeleteApplication = async (applicationId) => {
+    if (!confirm('Are you sure you want to delete this application?')) return;
+
+    try {
+      await adminAPI.deleteJobApplication(applicationId);
+      alert('Application deleted successfully');
+      fetchApplications();
+      fetchApplicationStats();
+      setShowApplicationModal(false);
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      alert('Failed to delete application');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const styles = {
       open: 'bg-green-100 text-green-800',
@@ -128,6 +195,28 @@ const JobsManagement = () => {
       on_hold: 'bg-yellow-100 text-yellow-800'
     };
     return styles[status] || styles.open;
+  };
+
+  const getApplicationStatusBadge = (status) => {
+    const styles = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      reviewed: 'bg-blue-100 text-blue-800',
+      shortlisted: 'bg-purple-100 text-purple-800',
+      accepted: 'bg-green-100 text-green-800',
+      rejected: 'bg-red-100 text-red-800'
+    };
+    return styles[status] || styles.pending;
+  };
+
+  const getApplicationStatusIcon = (status) => {
+    const icons = {
+      pending: AlertCircle,
+      reviewed: Eye,
+      shortlisted: FileText,
+      accepted: CheckCircle,
+      rejected: XCircle
+    };
+    return icons[status] || AlertCircle;
   };
 
   const getEmploymentTypeBadge = (type) => {
@@ -145,8 +234,8 @@ const JobsManagement = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Jobs Management</h2>
-          <p className="text-gray-600 mt-1">Manage job openings and applications</p>
+          <h2 className="text-2xl font-bold text-gray-900">Jobs & Careers Management</h2>
+          <p className="text-gray-600 mt-1">Manage job openings and review applications</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -156,37 +245,63 @@ const JobsManagement = () => {
             <RefreshCw className="w-4 h-4" />
             Refresh
           </button>
-          <button
-            onClick={() => {
-              resetForm();
-              setShowModal(true);
-            }}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Post New Job
-          </button>
+          {activeTab === 'jobs' && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Post New Job
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Jobs Grid */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      ) : jobs.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
-          <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Posted</h3>
-          <p className="text-gray-500 mb-6">Post your first job opening to start receiving applications</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 inline-flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Post First Job
-          </button>
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-4 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('jobs')}
+          className={`px-4 py-2 font-medium border-b-2 transition ${
+            activeTab === 'jobs'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Job Openings ({jobs.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('applications')}
+          className={`px-4 py-2 font-medium border-b-2 transition ${
+            activeTab === 'applications'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Applications {applicationStats && `(${applicationStats.total})`}
+        </button>
+      </div>
+
+      {/* Jobs Tab Content */}
+      {activeTab === 'jobs' && (
+        <>
+          {/* Jobs Grid */}
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="bg-white rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+              <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Posted</h3>
+              <p className="text-gray-500 mb-6">Post your first job opening to start receiving applications</p>
+              <button
+                onClick={() => setShowModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 inline-flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Post First Job
+              </button>
+            </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {jobs.map((job) => (
@@ -226,6 +341,12 @@ const JobsManagement = () => {
                   <Users className="w-4 h-4" />
                   <span>{job.vacancies} {job.vacancies === 1 ? 'Position' : 'Positions'}</span>
                 </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <FileText className="w-4 h-4" />
+                  <span className="font-medium text-blue-600">
+                    {job.application_count || 0} {job.application_count === 1 ? 'Application' : 'Applications'}
+                  </span>
+                </div>
                 {job.deadline && (
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="w-4 h-4" />
@@ -257,6 +378,128 @@ const JobsManagement = () => {
             </div>
           ))}
         </div>
+      )}
+        </>
+      )}
+
+      {/* Applications Tab Content */}
+      {activeTab === 'applications' && (
+        <>
+          {/* Statistics Cards */}
+          {applicationStats && (
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <p className="text-sm text-gray-600 mb-1">Total</p>
+                <p className="text-2xl font-bold text-gray-900">{applicationStats.total}</p>
+              </div>
+              <div className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-4">
+                <p className="text-sm text-yellow-700 mb-1">Pending</p>
+                <p className="text-2xl font-bold text-yellow-800">{applicationStats.pending}</p>
+              </div>
+              <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-4">
+                <p className="text-sm text-blue-700 mb-1">Reviewed</p>
+                <p className="text-2xl font-bold text-blue-800">{applicationStats.reviewed}</p>
+              </div>
+              <div className="bg-purple-50 rounded-lg shadow-sm border border-purple-200 p-4">
+                <p className="text-sm text-purple-700 mb-1">Shortlisted</p>
+                <p className="text-2xl font-bold text-purple-800">{applicationStats.shortlisted}</p>
+              </div>
+              <div className="bg-green-50 rounded-lg shadow-sm border border-green-200 p-4">
+                <p className="text-sm text-green-700 mb-1">Accepted</p>
+                <p className="text-2xl font-bold text-green-800">{applicationStats.accepted}</p>
+              </div>
+              <div className="bg-red-50 rounded-lg shadow-sm border border-red-200 p-4">
+                <p className="text-sm text-red-700 mb-1">Rejected</p>
+                <p className="text-2xl font-bold text-red-800">{applicationStats.rejected}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Filter */}
+          <div className="flex gap-2 mb-4">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Applications</option>
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="shortlisted">Shortlisted</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
+          {/* Applications List */}
+          {applications.length === 0 ? (
+            <div className="bg-white rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Applications Found</h3>
+              <p className="text-gray-500">Applications will appear here once candidates apply</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied On</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {applications.map((application) => {
+                      const StatusIcon = getApplicationStatusIcon(application.status);
+                      return (
+                        <tr key={application.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div>
+                              <div className="font-medium text-gray-900">{application.full_name}</div>
+                              <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+                                <Mail className="w-3 h-3" />
+                                {application.email}
+                              </div>
+                              <div className="text-sm text-gray-500 flex items-center gap-2">
+                                <Phone className="w-3 h-3" />
+                                {application.phone}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm font-medium text-gray-900">{application.jobs?.title || 'N/A'}</div>
+                            <div className="text-sm text-gray-500">{application.jobs?.department}</div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            {new Date(application.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getApplicationStatusBadge(application.status)}`}>
+                              <StatusIcon className="w-3 h-3" />
+                              {application.status.toUpperCase()}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() => handleViewApplication(application)}
+                              className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1"
+                            >
+                              <Eye className="w-4 h-4" />
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Create/Edit Modal */}
@@ -492,6 +735,172 @@ const JobsManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Application Detail Modal */}
+      {showApplicationModal && selectedApplication && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-900">Application Details</h3>
+              <button
+                onClick={() => {
+                  setShowApplicationModal(false);
+                  setSelectedApplication(null);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between">
+                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${getApplicationStatusBadge(selectedApplication.status)}`}>
+                  {React.createElement(getApplicationStatusIcon(selectedApplication.status), { className: "w-4 h-4" })}
+                  {selectedApplication.status.toUpperCase()}
+                </span>
+                <span className="text-sm text-gray-500">
+                  Applied on {new Date(selectedApplication.created_at).toLocaleDateString()}
+                </span>
+              </div>
+
+              {/* Job Information */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-2">Position Applied For</h4>
+                <p className="text-lg font-medium text-blue-600">{selectedApplication.jobs?.title}</p>
+                <p className="text-sm text-gray-600">{selectedApplication.jobs?.department} • {selectedApplication.jobs?.location}</p>
+              </div>
+
+              {/* Applicant Information */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Applicant Information</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm text-gray-600">Full Name</label>
+                    <p className="font-medium text-gray-900">{selectedApplication.full_name}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-gray-600">Email</label>
+                      <p className="font-medium text-gray-900 flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        {selectedApplication.email}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-600">Phone</label>
+                      <p className="font-medium text-gray-900 flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        {selectedApplication.phone}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Resume */}
+              {selectedApplication.resume_url && (
+                <div>
+                  <label className="text-sm text-gray-600 block mb-2">Resume</label>
+                  <a
+                    href={selectedApplication.resume_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Resume
+                  </a>
+                </div>
+              )}
+
+              {/* Cover Letter */}
+              {selectedApplication.cover_letter && (
+                <div>
+                  <label className="text-sm text-gray-600 block mb-2">Cover Letter</label>
+                  <div className="bg-gray-50 rounded-lg p-4 text-gray-700 whitespace-pre-wrap">
+                    {selectedApplication.cover_letter}
+                  </div>
+                </div>
+              )}
+
+              {/* Status Actions */}
+              <div className="border-t pt-6">
+                <h4 className="font-semibold text-gray-900 mb-3">Update Application Status</h4>
+                <div className="grid grid-cols-5 gap-2">
+                  <button
+                    onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'pending')}
+                    disabled={selectedApplication.status === 'pending'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedApplication.status === 'pending'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                    }`}
+                  >
+                    Pending
+                  </button>
+                  <button
+                    onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'reviewed')}
+                    disabled={selectedApplication.status === 'reviewed'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedApplication.status === 'reviewed'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    }`}
+                  >
+                    Reviewed
+                  </button>
+                  <button
+                    onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'shortlisted')}
+                    disabled={selectedApplication.status === 'shortlisted'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedApplication.status === 'shortlisted'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                    }`}
+                  >
+                    Shortlisted
+                  </button>
+                  <button
+                    onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'accepted')}
+                    disabled={selectedApplication.status === 'accepted'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedApplication.status === 'accepted'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-green-50 text-green-700 hover:bg-green-100'
+                    }`}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'rejected')}
+                    disabled={selectedApplication.status === 'rejected'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      selectedApplication.status === 'rejected'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-red-50 text-red-700 hover:bg-red-100'
+                    }`}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+
+              {/* Delete Button */}
+              <div className="border-t pt-4">
+                <button
+                  onClick={() => handleDeleteApplication(selectedApplication.id)}
+                  className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Application
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -112,6 +112,13 @@ export const adminAPI = {
   deleteJob: (id) => api.delete(`/admin/jobs/${id}`),
   getJobApplications: (jobId) => api.get(`/admin/jobs/${jobId}/applications`),
   
+  // Job Applications Management
+  getAllJobApplications: (params) => api.get('/admin/job-applications', { params }),
+  getJobApplicationStats: () => api.get('/admin/job-applications/stats'),
+  getJobApplicationById: (id) => api.get(`/admin/job-applications/${id}`),
+  updateApplicationStatus: (id, status) => api.patch(`/admin/job-applications/${id}/status`, { status }),
+  deleteJobApplication: (id) => api.delete(`/admin/job-applications/${id}`),
+  
   // Admins Management (superAdmin only)
   getAdmins: (params) => api.get('/admin/admins', { params }),
   createAdmin: (data) => api.post('/admin/admins', data),

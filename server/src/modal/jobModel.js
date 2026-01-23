@@ -7,7 +7,10 @@ const jobModel = {
     try {
       let query = supabaseAdmin
         .from('jobs')
-        .select('*')
+        .select(`
+          *,
+          applications:job_applications(count)
+        `)
         .order('created_at', { ascending: false });
 
       if (filters.status) {
@@ -21,7 +24,15 @@ const jobModel = {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data;
+      
+      // Transform the response to include application_count
+      const jobsWithCount = data.map(job => ({
+        ...job,
+        application_count: job.applications?.[0]?.count || 0,
+        applications: undefined // Remove the applications object
+      }));
+      
+      return jobsWithCount;
     } catch (error) {
       throw error;
     }

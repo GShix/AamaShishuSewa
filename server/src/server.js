@@ -9,6 +9,7 @@ import aiRoutes from './routes/ai.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
 import adminRoutes from './routes/admin/admin.js';
 import adminJobRoutes from './routes/admin/jobs.js';
+import adminJobApplicationRoutes from './routes/admin/jobApplications.js';
 import adminReviewRoutes from './routes/admin/reviews.js';
 import userJobRoutes from './routes/user/jobs.js';
 import userBookingRoutes from './routes/user/bookings.js';
@@ -78,6 +79,7 @@ app.use('/api/debug', debugRoutes); // Temporary debug routes
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/jobs', adminJobRoutes);
+app.use('/api/admin/job-applications', adminJobApplicationRoutes);
 app.use('/api/admin/reviews', adminReviewRoutes);
 app.use('/api/admin', adminRoutes);
 
