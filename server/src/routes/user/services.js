@@ -14,14 +14,14 @@ router.get('/', async (req, res) => {
       .order('created_at', { ascending: false });
     
     // Try both status and is_active columns for compatibility
-    const { data, error } = await query.or('status.eq.active,is_active.eq.true');
+    const { data: services, error } = await query.or('status.eq.active,is_active.eq.true');
 
     if (error) {
       console.error('Services query error:', error);
       throw error;
     }
 
-    res.json(data || []);
+    res.json({ services: services || [] });
   } catch (error) {
     console.error('Error fetching services:', error);
     res.status(500).json({ error: 'Failed to fetch services' });

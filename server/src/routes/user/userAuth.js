@@ -1,4 +1,4 @@
-// server/src/routes/auth.js
+// server/src/routes/user/userAuth.js
 import express from 'express';
 import { 
   register, 
@@ -10,6 +10,18 @@ import {
   resetPassword,
   changePassword
 } from '../../controllers/user/authController.js';
+import {
+  // Registration with OTP
+  sendRegistrationOTP,
+  verifyRegistrationOTP,
+  resendRegistrationOTP,
+  
+  // Forgot password with OTP
+  sendForgotPasswordOTP,
+  verifyForgotPasswordOTP,
+  resetPassword as resetPasswordNew,
+  resendForgotPasswordOTP
+} from '../../controllers/user/authControllerNew.js';
 import { authenticate } from '../../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
 
@@ -27,9 +39,15 @@ const validate = (req, res, next) => {
 };
 
 // ============================================================================
-// PUBLIC ROUTES (No authentication required)
+// PUBLIC ROUTES - REGISTRATION
 // ============================================================================
 
+// New OTP-based registration routes
+router.post('/register/send-otp', sendRegistrationOTP);
+router.post('/register/verify-otp', verifyRegistrationOTP);
+router.post('/register/resend-otp', resendRegistrationOTP);
+
+// Legacy direct registration (kept for backward compatibility)
 router.post('/register', [
   body('email')
     .isEmail()
@@ -48,6 +66,10 @@ router.post('/register', [
   validate
 ], register);
 
+// ============================================================================
+// PUBLIC ROUTES - LOGIN
+// ============================================================================
+
 router.post('/login', [
   body('email')
     .notEmpty()
@@ -58,50 +80,23 @@ router.post('/login', [
   validate
 ], login);
 
-// Debug endpoint to check user status (temporary - remove in production)
-router.post('/debug-user-status', async (req, res) => {
-  try {
-    const { email } = req.body;
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-    
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, email, phone, full_name, status, role, created_at')
-      .eq('email', email)
-      .single();
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json({
-      user,
-      statusCheck: {
-        rawValue: user.status,
-        type: typeof user.status,
-        isNull: user.status === null,
-        isUndefined: user.status === undefined,
-        toLowerCase: user.status?.toLowerCase(),
-        equals_active: user.status === 'active',
-        equals_active_lowercase: user.status?.toLowerCase() === 'active'
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// ============================================================================
+// PUBLIC ROUTES - FORGOT PASSWORD
+// ============================================================================
 
+// New OTP-based forgot password routes
+router.post('/forgot-password/send-otp', sendForgotPasswordOTP);
+router.post('/forgot-password/verify-otp', verifyForgotPasswordOTP);
+router.post('/forgot-password/reset', resetPasswordNew);
+router.post('/forgot-password/resend-otp', resendForgotPasswordOTP);
+
+// Legacy forgot password routes (kept for backward compatibility)
 router.post('/forgot-password', [
   body('email')
     .notEmpty()
     .withMessage('Email is required'),
   validate
 ], forgotPassword);
-
 
 router.post('/verify-otp', [
   body('email')
@@ -155,7 +150,6 @@ router.post('/change-password', [
     .withMessage('New password must be at least 6 characters'),
   validate
 ], changePassword);
-
 
 router.post('/logout', authenticate, (req, res) => {
   // With JWT, logout is handled client-side by removing token

@@ -1,6 +1,6 @@
 // client/src/pages/Login.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Heart, LogIn, Mail, Lock, AlertCircle, Loader, ArrowLeft, Shield, Users, Baby, Sparkles } from 'lucide-react';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
@@ -8,6 +8,7 @@ import useDocumentTitle from '../../hooks/useDocumentTitle';
 const Login = () => {
   useDocumentTitle('Login - आमा शिशु सेवा');
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, loading, error: authError } = useAuth();
   const [language, setLanguage] = useState('ne');
   
@@ -102,7 +103,21 @@ const Login = () => {
       if (result.user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
-        navigate('/dashboard');
+        // Check if there's a return URL with job selection from location state
+        const returnTo = location.state?.returnTo || '/dashboard';
+        const selectedJob = location.state?.selectedJob;
+        const activeTab = location.state?.activeTab;
+        
+        if (selectedJob && activeTab) {
+          navigate(returnTo, {
+            state: {
+              selectedJob,
+              activeTab
+            }
+          });
+        } else {
+          navigate(returnTo);
+        }
       }
     }
   };

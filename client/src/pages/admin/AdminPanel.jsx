@@ -17,6 +17,7 @@ import JobsManagement from '../../components/admin/JobsManagement';
 import AccountSettings from '../../components/admin/AccountSettings';
 import UsersManagement from '../../components/admin/UsersManagement';
 import EmployeesManagement from '../../components/admin/EmployeesManagement';
+import AdminsManagement from '../../components/admin/AdminsManagement';
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -70,8 +71,12 @@ const AdminPanel = () => {
     navigate('/admin/login');
   };
 
+  // Check if user is superAdmin
+  const isSuperAdmin = adminUser?.role === 'superAdmin';
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    ...(isSuperAdmin ? [{ id: 'admins', label: 'Admins', icon: Shield }] : []),
     { id: 'users', label: 'Users', icon: Users },
     { id: 'bookings', label: 'Appointments', icon: Calendar },
     { id: 'employees', label: 'Employees', icon: Briefcase },
@@ -204,7 +209,6 @@ const AdminPanel = () => {
       </div>
 
       {/* Quick Actions */}
-      {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         <button
           onClick={() => setActiveTab('users')}
@@ -229,7 +233,7 @@ const AdminPanel = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('notices')}
+          onClick={() => setActiveTab('posts')}
           className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation sm:col-span-2 lg:col-span-1"
         >
           <div className="text-left">
@@ -243,9 +247,28 @@ const AdminPanel = () => {
   );
 
   const renderContent = () => {
+    // Prevent access to admins section for non-superAdmin
+    if (activeTab === 'admins' && !isSuperAdmin) {
+      return (
+        <div className="bg-white rounded-xl shadow-md p-8 text-center">
+          <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600">You need superAdmin privileges to access admin management.</p>
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          >
+            Go to Dashboard
+          </button>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
+      case 'admins':
+        return <AdminsManagement />;
       case 'users':
         return <UsersManagement />;
       case 'bookings':

@@ -315,12 +315,12 @@ export const getDashboardStats = async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        users:user_id (
+        users!user_id (
           id,
           full_name,
           email
         ),
-        employees:employee_id (
+        employees!employee_id (
           id,
           full_name,
           phone

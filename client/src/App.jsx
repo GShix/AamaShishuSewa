@@ -8,13 +8,11 @@ import Register from './pages/user/Register';
 import Dashboard from './pages/user/Dashboard';
 import JoinUs from './pages/JoinUs';
 import Services from './pages/Services';
-import BookService from './pages/BookService';
 import BookAppointment from './pages/BookAppointment';
 import Contact from './pages/Contact';
 import ScrollToTop from './components/common/ScrollToTop';
 import ForgotPassword from './pages/ForgetPassword';
 import Careers from './pages/Careers';
-import Apply from './pages/Apply';
 import Leaderboard from './pages/Leaderboard';
 import EmployeeDetail from './pages/EmployeeDetail';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -130,9 +128,8 @@ function AppContent() {
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
         
-        {/* Career pages should be accessible to both logged-in and guest users */}
+        {/* Career pages - public job listings */}
         <Route path="/careers" element={<Careers />} />
-        <Route path="/careers/apply" element={<Apply />} />
 
         {/* Leaderboard */}
         {/* <Route path="/leaderboard" element={<Leaderboard />} />
@@ -143,7 +140,6 @@ function AppContent() {
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forget_password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
         <Route path="/join_us" element={<PublicRoute><JoinUs /></PublicRoute>} />
-        {/* <Route path="/book" element={<PublicRoute><BookService /></PublicRoute>} /> */}
 
         {/* --- PROTECTED ROUTES (Requires login) --- */}
         <Route

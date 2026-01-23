@@ -41,11 +41,11 @@ import {
 } from '../../controllers/admin/serviceController.js';
 
 import {
-  getAllNotices,
-  createNotice,
-  updateNotice,
-  deleteNotice
-} from '../../controllers/admin/noticeController.js';
+  getAllPosts,
+  createPost,
+  updatePost,
+  deletePost
+} from '../../controllers/admin/postController.js';
 
 import { authenticate, requireAdmin, requireSuperAdmin } from '../../middleware/auth.js';
 
@@ -94,11 +94,11 @@ router.post('/services', createService);
 router.put('/services/:id', updateService);
 router.delete('/services/:id', deleteService);
 
-// NOTICES MANAGEMENT
-router.get('/notices', getAllNotices);
-router.post('/notices', createNotice);
-router.put('/notices/:id', updateNotice);
-router.delete('/notices/:id', deleteNotice);
+// POSTS MANAGEMENT (includes notices as category)
+router.get('/posts', getAllPosts);
+router.post('/posts', createPost);
+router.put('/posts/:id', updatePost);
+router.delete('/posts/:id', deletePost);
 
 export default router;
 

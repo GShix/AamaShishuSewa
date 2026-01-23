@@ -4,13 +4,27 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+let resend = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+} else {
+  console.warn('⚠️  RESEND_API_KEY not found. Email functionality will be disabled.');
+}
 
 /**
  * Send OTP verification email
  */
 export const sendOTPEmail = async (to, otp, type = 'registration') => {
   try {
+    // If Resend is not configured, log the OTP instead
+    if (!resend) {
+      console.log('📧 [EMAIL DISABLED] Would send OTP email to:', to);
+      console.log('📧 OTP:', otp);
+      console.log('📧 Type:', type);
+      return { success: true, message: 'Email service not configured. Check console for OTP.' };
+    }
+
     const subject = type === 'registration' 
       ? '🔐 Verify Your Email - Aama Shishu Sewa'
       : '🔑 Reset Your Password - Aama Shishu Sewa';
@@ -44,6 +58,11 @@ export const sendOTPEmail = async (to, otp, type = 'registration') => {
  */
 export const sendWelcomeEmail = async (to, name) => {
   try {
+    if (!resend) {
+      console.log('📧 [EMAIL DISABLED] Would send welcome email to:', to);
+      return { success: true, message: 'Email service not configured.' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'Aama Shishu Sewa <noreply@yourdomain.com>',
       to: [to],
@@ -69,6 +88,11 @@ export const sendWelcomeEmail = async (to, name) => {
  */
 export const sendPasswordResetConfirmation = async (to, name) => {
   try {
+    if (!resend) {
+      console.log('📧 [EMAIL DISABLED] Would send password reset confirmation to:', to);
+      return { success: true, message: 'Email service not configured.' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'Aama Shishu Sewa <noreply@yourdomain.com>',
       to: [to],

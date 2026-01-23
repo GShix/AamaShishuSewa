@@ -42,6 +42,21 @@ export const userAPI = {
   // Job Applications
   applyForJob: (jobId, data) => api.post(`/jobs/${jobId}/apply`, data),
   getMyApplications: () => api.get('/jobs/my-applications'),
+  
+  // Reviews
+  createReview: (data) => api.post('/reviews', data),
+  getReviews: (params) => api.get('/reviews', { params }),
+  getMyReviews: () => api.get('/reviews/my-reviews'),
+  updateReview: (reviewId, data) => api.put(`/reviews/${reviewId}`, data),
+  deleteReview: (reviewId) => api.delete(`/reviews/${reviewId}`),
+  canReviewBooking: (bookingId) => api.get(`/reviews/can-review/${bookingId}`),
+  
+  // Notifications
+  getNotifications: (params) => api.get('/notifications', { params }),
+  getUnreadCount: () => api.get('/notifications/unread-count'),
+  markAsRead: (notificationId) => api.patch(`/notifications/${notificationId}/read`),
+  markAllAsRead: () => api.patch('/notifications/mark-all-read'),
+  deleteNotification: (notificationId) => api.delete(`/notifications/${notificationId}`),
 };
 
 export const adminAuthAPI = {
@@ -84,13 +99,7 @@ export const adminAPI = {
   updateService: (id, data) => api.put(`/admin/services/${id}`, data),
   deleteService: (id) => api.delete(`/admin/services/${id}`),
   
-  // Notices Management
-  getNotices: (params) => api.get('/admin/notices', { params }),
-  createNotice: (data) => api.post('/admin/notices', data),
-  updateNotice: (id, data) => api.put(`/admin/notices/${id}`, data),
-  deleteNotice: (id) => api.delete(`/admin/notices/${id}`),
-  
-  // Posts Management
+  // Posts Management (includes notices as category)
   getPosts: (params) => api.get('/admin/posts', { params }),
   createPost: (data) => api.post('/admin/posts', data),
   updatePost: (id, data) => api.put(`/admin/posts/${id}`, data),
@@ -102,6 +111,20 @@ export const adminAPI = {
   updateJob: (id, data) => api.put(`/admin/jobs/${id}`, data),
   deleteJob: (id) => api.delete(`/admin/jobs/${id}`),
   getJobApplications: (jobId) => api.get(`/admin/jobs/${jobId}/applications`),
+  
+  // Admins Management (superAdmin only)
+  getAdmins: (params) => api.get('/admin/admins', { params }),
+  createAdmin: (data) => api.post('/admin/admins', data),
+  updateAdminRole: (id, role) => api.patch(`/admin/admins/${id}/role`, { role }),
+  deleteAdmin: (id) => api.delete(`/admin/admins/${id}`),
+  
+  // Reviews Management
+  getReviews: (params) => api.get('/admin/reviews', { params }),
+  getReviewStats: () => api.get('/admin/reviews/stats'),
+  updateReviewStatus: (reviewId, status) => api.patch(`/admin/reviews/${reviewId}/status`, { status }),
+  respondToReview: (reviewId, responseText) => api.post(`/admin/reviews/${reviewId}/respond`, { response_text: responseText }),
+  toggleFeaturedReview: (reviewId) => api.patch(`/admin/reviews/${reviewId}/featured`),
+  deleteReview: (reviewId) => api.delete(`/admin/reviews/${reviewId}`),
 };
 
 export const servicesAPI = {
@@ -112,6 +135,11 @@ export const servicesAPI = {
 export const jobsAPI = {
   getOpenJobs: (params) => api.get('/jobs', { params }),
   getJobById: (id) => api.get(`/jobs/${id}`),
+};
+
+export const postsAPI = {
+  getAllPosts: (params) => api.get('/posts', { params }),
+  getPostById: (id) => api.get(`/posts/${id}`),
 };
 
 export default api;

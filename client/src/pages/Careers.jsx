@@ -3,11 +3,13 @@ import { Heart, Home, Flower2, UserPlus, Baby, ChevronRight, GraduationCap } fro
 import { useNavigate } from 'react-router-dom';
 import PublicLayout from '../layout/PublicLayout';
 import useDocumentTitle from '../hooks/useDocumentTitle';
-import { useLanguage } from '../context/LanguageContext'; // Import hook
+import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 const Careers = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   useDocumentTitle(language === 'ne' ? 'क्यारियर - हाम्रो टोलीमा सामेल हुनुहोस्' : 'Careers - Join Our Professional Team');
 
@@ -23,7 +25,26 @@ const Careers = () => {
   const handleApply = (job) => {
     // Pass essential strings to the application page
     const jobData = { title: job.title, eng: job.eng };
-    navigate('/careers/apply', { state: { job: jobData } });
+    
+    // Check if user is authenticated
+    if (isAuthenticated) {
+      // Redirect to dashboard with selected job and careers tab active
+      navigate('/dashboard', { 
+        state: { 
+          selectedJob: jobData,
+          activeTab: 'careers'
+        } 
+      });
+    } else {
+      // Redirect to login with return URL to come back to dashboard with job selection
+      navigate('/login', { 
+        state: { 
+          returnTo: '/dashboard',
+          selectedJob: jobData,
+          activeTab: 'careers'
+        } 
+      });
+    }
   };
 
   if (!t || !t.careers) return null;

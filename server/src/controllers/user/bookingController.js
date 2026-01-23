@@ -1,31 +1,56 @@
-// server/src/controllers/bookingController.js
-import { supabaseAdmin, supabaseHelpers } from '../../config/supabase.js';
-import { autoAssignProfessional } from '../../services/matchingService.js';
-import { generateCarePlan, generateNotification } from '../../services/carePlanService.js';
+// server/src/controllers/user/bookingController.js
+import { supabaseAdmin } from '../../config/supabase.js';
+import { notifyBookingCreated } from '../../services/enhancedNotificationService.js';
 
 /**
- * Create a new booking with AI automation
+ * Create a new booking for a service
  */
 export const createBooking = async (req, res) => {
   try {
     const userId = req.userId;
     const {
-      serviceType,
-      bookingDate,
-      bookingTime,
-      durationDays,
-      clientAddress,
-      latitude,
-      longitude,
-      specialRequirements,
-      nwaranDetails
+      service_id,
+      service_type,
+      booking_date,
+      duration_days,
+      client_address,
+      client_phone,
+      special_requirements
     } = req.body;
 
     // Validate required fields
-    if (!serviceType || !bookingDate || !clientAddress || !latitude || !longitude) {
+    if (!service_type || !booking_date || !client_address || !client_phone) {
       return res.status(400).json({ 
-        error: 'Service type, date, address, and location are required' 
+        error: 'Service type, booking date, address, and phone are required' 
       });
+    }
+
+    // Validate booking date is not in the past
+    const bookingDate = new Date(booking_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (bookingDate < today) {
+      return res.status(400).json({ 
+        error: 'Booking date cannot be in the past' 
+      });
+    }
+
+    // If service_id is provided, verify the service exists and is active
+    if (service_id) {
+      const { data: service, error: serviceError } = await supabaseAdmin
+        .from('services')
+        .select('id, name, base_price, status, is_active')
+        .eq('id', service_id)
+        .single();
+
+      if (serviceError || !service) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+
+      if (service.status !== 'active' && !service.is_active) {
+        return res.status(400).json({ error: 'Service is not available for booking' });
+      }
     }
 
     // Create booking
@@ -33,78 +58,64 @@ export const createBooking = async (req, res) => {
       .from('bookings')
       .insert({
         user_id: userId,
-        service_type: serviceType,
-        booking_date: bookingDate,
-        booking_time: bookingTime,
-        duration_days: durationDays || 1,
-        client_address: clientAddress,
-        latitude,
-        longitude,
-        special_requirements: specialRequirements,
-        status: 'pending'
+        service_id: service_id || null,
+        service_type,
+        booking_date,
+        duration_days: duration_days || 1,
+        client_address,
+        client_phone,
+        special_requirements: special_requirements || null,
+        status: 'pending',
+        payment_status: 'pending'
       })
       .select()
       .single();
 
-    if (bookingError) throw bookingError;
-
-    // If Nwaran service, save additional details
-    if (serviceType === 'nwaran' && nwaranDetails) {
-      const { error: nwaranError } = await supabaseAdmin
-        .from('nwaran_details')
-        .insert({
-          booking_id: booking.id,
-          baby_birth_date: nwaranDetails.babyBirthDate,
-          baby_birth_time: nwaranDetails.babyBirthTime,
-          baby_gender: nwaranDetails.babyGender,
-          parents_gotra: nwaranDetails.parentsGotra,
-          preferred_name_suggestions: nwaranDetails.preferredNames,
-          priest_required: nwaranDetails.priestRequired,
-          ceremony_location: nwaranDetails.ceremonyLocation,
-          number_of_guests: nwaranDetails.numberOfGuests,
-          additional_rituals: nwaranDetails.additionalRituals
-        });
-
-      if (nwaranError) console.error('Nwaran details error:', nwaranError);
+    if (bookingError) {
+      console.error('Booking creation error:', bookingError);
+      throw bookingError;
     }
 
-    // AI AUTOMATION WORKFLOW
-    try {
-      // 1. Auto-assign best professional
-      const assignmentResult = await autoAssignProfessional(booking.id);
-      
-      if (assignmentResult.success) {
-        booking.employee_id = assignmentResult.professional.id;
-        booking.status = 'confirmed';
+    // Get user details for notification
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('id, email, phone, full_name')
+      .eq('id', userId)
+      .single();
 
-        // 2. Generate care plan
-        await generateCarePlan(booking.id);
+    // Get service details for notification (if service_id provided)
+    let serviceDetails = null;
+    if (service_id) {
+      const { data: serviceData } = await supabaseAdmin
+        .from('services')
+        .select('id, name, description')
+        .eq('id', service_id)
+        .single();
+      serviceDetails = serviceData;
+    }
 
-        // 3. Send notifications
-        await generateNotification(booking.id, 'new_booking');
-        await generateNotification(booking.id, 'booking_confirmed');
-      }
-    } catch (aiError) {
-      console.error('AI automation error:', aiError);
-      // Continue even if AI features fail
+    // Send booking created notification (async, don't wait)
+    if (user) {
+      notifyBookingCreated(booking, user, serviceDetails).catch(err => {
+        console.error('Failed to send booking notification:', err);
+      });
     }
 
     res.status(201).json({
       message: 'Booking created successfully',
-      booking,
-      automated: true
+      booking
     });
 
   } catch (error) {
     console.error('Create booking error:', error);
-    res.status(500).json({ error: 'Failed to create booking' });
+    res.status(500).json({ error: error.message || 'Failed to create booking' });
   }
 };
 
 /**
- * Get all bookings for current user
+ * Get all bookings for the logged-in user
  */
-export const getUserBookings = async (req, res) => {
+export const getMyBookings = async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -112,21 +123,25 @@ export const getUserBookings = async (req, res) => {
       .from('bookings')
       .select(`
         *,
+        services:service_id (
+          id, name, name_ne, description, description_ne, base_price, category
+        ),
         employees:employee_id (
           id, full_name, phone, rating, specialization
-        ),
-        nwaran_details (*),
-        care_plans (*)
+        )
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Get bookings error:', error);
+      throw error;
+    }
 
-    res.json({ bookings });
+    res.json({ bookings: bookings || [] });
 
   } catch (error) {
-    console.error('Get bookings error:', error);
+    console.error('Get my bookings error:', error);
     res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 };
@@ -143,21 +158,24 @@ export const getBookingById = async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        users:user_id (id, full_name, phone, email, address),
-        employees:employee_id (
-          id, full_name, phone, email, rating, 
-          specialization, experience_years
+        services:service_id (
+          id, name, name_ne, description, description_ne, base_price
         ),
-        nwaran_details (*),
-        care_plans (*)
+        employees:employee_id (
+          id, full_name, phone, email, rating, specialization
+        )
       `)
       .eq('id', bookingId)
       .single();
 
     if (error) throw error;
 
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
     // Check authorization
-    if (booking.user_id !== userId && req.userRole !== 'admin') {
+    if (booking.user_id !== userId) {
       return res.status(403).json({ error: 'Unauthorized access' });
     }
 
@@ -166,64 +184,6 @@ export const getBookingById = async (req, res) => {
   } catch (error) {
     console.error('Get booking error:', error);
     res.status(500).json({ error: 'Failed to fetch booking' });
-  }
-};
-
-/**
- * Update booking status
- */
-export const updateBookingStatus = async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-    const { status } = req.body;
-    const userId = req.userId;
-
-    const validStatuses = ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
-    }
-
-    // Get booking to check ownership
-    const { data: booking } = await supabaseAdmin
-      .from('bookings')
-      .select('user_id')
-      .eq('id', bookingId)
-      .single();
-
-    if (!booking) {
-      return res.status(404).json({ error: 'Booking not found' });
-    }
-
-    if (booking.user_id !== userId && req.userRole !== 'admin') {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
-
-    // Update status
-    const { data: updatedBooking, error } = await supabaseAdmin
-      .from('bookings')
-      .update({ 
-        status,
-        updated_at: new Date()
-      })
-      .eq('id', bookingId)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Send notification on status change
-    if (status === 'completed') {
-      // Could trigger review request here
-    }
-
-    res.json({
-      message: 'Booking status updated',
-      booking: updatedBooking
-    });
-
-  } catch (error) {
-    console.error('Update booking error:', error);
-    res.status(500).json({ error: 'Failed to update booking' });
   }
 };
 
@@ -246,7 +206,7 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    if (booking.user_id !== userId && req.userRole !== 'admin') {
+    if (booking.user_id !== userId) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -254,12 +214,15 @@ export const cancelBooking = async (req, res) => {
       return res.status(400).json({ error: 'Cannot cancel completed booking' });
     }
 
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({ error: 'Booking is already cancelled' });
+    }
+
     const { data: cancelledBooking, error } = await supabaseAdmin
       .from('bookings')
       .update({ 
         status: 'cancelled',
-        special_requirements: reason ? `Cancellation reason: ${reason}` : null,
-        updated_at: new Date()
+        updated_at: new Date().toISOString()
       })
       .eq('id', bookingId)
       .select()
@@ -280,8 +243,7 @@ export const cancelBooking = async (req, res) => {
 
 export default {
   createBooking,
-  getUserBookings,
+  getMyBookings,
   getBookingById,
-  updateBookingStatus,
   cancelBooking
 };

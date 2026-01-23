@@ -1,8 +1,8 @@
 // client/src/pages/user/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { userAPI, servicesAPI, jobsAPI } from '../../utils/api';
+import { userAPI, servicesAPI, jobsAPI, postsAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
 import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
 import { 
@@ -32,15 +32,18 @@ import {
   Bell,
   Search,
   Globe,
-  ChevronDown
+  ChevronDown,
+  Eye
 } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [myApplications, setMyApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -52,10 +55,24 @@ const Dashboard = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [applying, setApplying] = useState(false);
   const [applicationData, setApplicationData] = useState({
+    full_name: '',
     cover_letter: '',
     resume_url: '',
     phone: '',
     email: ''
+  });
+
+  // Booking state
+  const [selectedService, setSelectedService] = useState(null);
+  const [submittingBooking, setSubmittingBooking] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    service_id: '',
+    service_type: '',
+    booking_date: '',
+    duration_days: 1,
+    client_address: '',
+    client_phone: '',
+    special_requirements: ''
   });
 
   const translations = {
@@ -128,13 +145,25 @@ const Dashboard = () => {
     fetchServices();
     fetchJobs();
     fetchMyApplications();
+    fetchPosts();
   }, [isAuthenticated, navigate]);
+
+  // Handle incoming job selection from careers page
+  useEffect(() => {
+    if (location.state?.selectedJob && location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+      setSelectedJob(location.state.selectedJob);
+      // Clear the location state to prevent re-triggering
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   // Initialize application data when user is loaded
   useEffect(() => {
     if (user) {
       setApplicationData(prev => ({
         ...prev,
+        full_name: user.full_name || user.name || '',
         phone: user.phone || '',
         email: user.email || ''
       }));
@@ -156,9 +185,20 @@ const Dashboard = () => {
   const fetchServices = async () => {
     try {
       const response = await servicesAPI.getAll();
-      setServices(response.data || []);
+      setServices(response.data.services || []);
     } catch (error) {
       console.error('Error fetching services:', error);
+      setServices([]);
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      const response = await postsAPI.getAllPosts({ limit: 10 });
+      setPosts(response.data.posts || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setPosts([]);
     }
   };
 
@@ -186,16 +226,50 @@ const Dashboard = () => {
   };
 
   const handleBookService = (service) => {
-    navigate('/book', { state: { selectedService: service } });
+    setSelectedService(service);
+    setBookingData(prev => ({
+      ...prev,
+      service_id: service.id,
+      service_type: service.category || service.name.toLowerCase().replace(/\s+/g, '_'),
+      client_phone: user?.phone || '',
+      client_address: user?.address || ''
+    }));
+  };
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedService) return;
+
+    try {
+      setSubmittingBooking(true);
+      const response = await userAPI.createBooking(bookingData);
+      alert(language === 'ne' ? 'बुकिङ सफलतापूर्वक सिर्जना गरियो!' : 'Booking created successfully!');
+      setSelectedService(null);
+      fetchBookings();
+      setBookingData({
+        service_id: '',
+        service_type: '',
+        booking_date: '',
+        duration_days: 1,
+        client_address: '',
+        client_phone: '',
+        special_requirements: ''
+      });
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert(error.response?.data?.error || 'Failed to create booking');
+    } finally {
+      setSubmittingBooking(false);
+    }
   };
 
   const menuItems = [
     { id: 'dashboard', label: language === 'ne' ? 'ड्यासबोर्ड' : 'Dashboard', icon: LayoutDashboard },
-    { id: 'bookings', label: language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings', icon: Calendar },
     { id: 'appointments', label: language === 'ne' ? 'ग्राहक अपोइन्टमेन्ट' : 'Customer Appointment', icon: Clock },
     { id: 'services', label: language === 'ne' ? 'सेवाहरू' : 'Services', icon: Package },
     { id: 'careers', label: language === 'ne' ? 'रोजगारी' : 'Careers', icon: Briefcase },
     { id: 'feeds', label: language === 'ne' ? 'समाचार' : 'Feeds', icon: FileText },
+    { id: 'bookings', label: language === 'ne' ? 'सेवा बुकिङहरू' : 'Service Bookings', icon: Calendar },
     { id: 'profile', label: language === 'ne' ? 'प्रोफाइल' : 'Profile', icon: User },
   ];
 
@@ -452,10 +526,10 @@ const Dashboard = () => {
               
               <div className="p-4 lg:p-6">
                 <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-2">
-                  {language === 'ne' ? service.name_ne : service.name}
+                  {language === 'ne' ? (service.name_ne || service.name) : service.name}
                 </h3>
                 <p className="text-gray-600 text-xs lg:text-sm mb-4 line-clamp-3">
-                  {language === 'ne' ? service.description_ne : service.description}
+                  {language === 'ne' ? (service.description_ne || service.description) : service.description}
                 </p>
 
                 {service.base_price && (
@@ -644,19 +718,105 @@ const Dashboard = () => {
 
   const renderFeeds = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
-        <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            {language === 'ne' ? 'छिट्टै आउँदैछ' : 'Coming Soon'}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl lg:text-2xl font-bold text-gray-900">
+          {language === 'ne' ? 'समाचार र अपडेटहरू' : 'News & Updates'}
+        </h2>
+      </div>
+
+      {posts.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-md p-8 lg:p-12 text-center">
+          <FileText className="w-12 lg:w-16 h-12 lg:h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg lg:text-xl font-semibold text-gray-700 mb-2">
+            {language === 'ne' ? 'कुनै पोस्ट उपलब्ध छैन' : 'No posts available'}
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm lg:text-base">
             {language === 'ne' 
               ? 'प्रशासकद्वारा पोस्ट गरिएका समाचार र अपडेटहरू यहाँ देखिनेछन्' 
               : 'News and updates posted by admin will appear here'}
           </p>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-4 lg:space-y-6">
+          {posts.map((post) => (
+            <div key={post.id} className="bg-white rounded-xl lg:rounded-2xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+              {post.image_url && (
+                <div className="h-48 lg:h-64 overflow-hidden">
+                  <img 
+                    src={post.image_url} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              
+              <div className="p-4 lg:p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    post.category === 'news' ? 'bg-blue-100 text-blue-800' :
+                    post.category === 'update' ? 'bg-green-100 text-green-800' :
+                    post.category === 'announcement' ? 'bg-purple-100 text-purple-800' :
+                    post.category === 'event' ? 'bg-yellow-100 text-yellow-800' :
+                    post.category === 'notice' ? 'bg-orange-100 text-orange-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {post.category}
+                  </span>
+                  {post.priority === 'high' && (
+                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                      High Priority
+                    </span>
+                  )}
+                  {post.priority === 'urgent' && (
+                    <span className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-medium flex items-center gap-1">
+                      <Bell className="w-3 h-3" />
+                      Urgent
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-lg lg:text-2xl font-bold text-gray-900 mb-3">
+                  {post.title}
+                </h3>
+
+                {post.excerpt && (
+                  <p className="text-gray-600 text-sm lg:text-base mb-4">
+                    {post.excerpt}
+                  </p>
+                )}
+
+                <div className="prose prose-sm lg:prose max-w-none text-gray-700 mb-4">
+                  <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
+                </div>
+
+                <div className="flex items-center justify-between text-xs lg:text-sm text-gray-500 pt-4 border-t">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {new Date(post.published_at || post.created_at).toLocaleDateString()}
+                    </div>
+                    {post.views > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {post.views} views
+                      </div>
+                    )}
+                  </div>
+                  {Array.isArray(post.tags) && post.tags.length > 0 && (
+                    <div className="flex gap-2">
+                      {post.tags.slice(0, 3).map((tag, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -670,7 +830,7 @@ const Dashboard = () => {
       alert(language === 'ne' ? 'आवेदन सफलतापूर्वक पेश गरियो!' : 'Application submitted successfully!');
       setSelectedJob(null);
       fetchMyApplications();
-      setApplicationData({ cover_letter: '', resume_url: '', phone: user?.phone || '', email: user?.email || '' });
+      setApplicationData({ full_name: user?.full_name || user?.name || '', cover_letter: '', resume_url: '', phone: user?.phone || '', email: user?.email || '' });
     } catch (error) {
       console.error('Error applying for job:', error);
       alert(error.response?.data?.error || 'Failed to submit application');
@@ -839,6 +999,20 @@ const Dashboard = () => {
                   <form onSubmit={handleJobApply} className="space-y-4 pt-4 border-t border-gray-200">
                     <h4 className="font-semibold text-gray-900">{language === 'ne' ? 'आवेदन फारम' : 'Application Form'}</h4>
                     
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {language === 'ne' ? 'पूरा नाम' : 'Full Name'} *
+                      </label>
+                      <input
+                        type="text"
+                        value={applicationData.full_name}
+                        onChange={(e) => setApplicationData({...applicationData, full_name: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder={language === 'ne' ? 'तपाईंको पूरा नाम' : 'Your full name'}
+                        required
+                      />
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -946,6 +1120,143 @@ const Dashboard = () => {
       default:
         return renderDashboard();
     }
+  };
+
+  const renderBookingModal = () => {
+    if (!selectedService) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <h3 className="text-xl font-bold text-gray-900">
+              {language === 'ne' ? 'सेवा बुक गर्नुहोस्' : 'Book Service'}
+            </h3>
+            <button
+              onClick={() => setSelectedService(null)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="p-6">
+            {/* Service Details */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold text-gray-900 mb-2">
+                {language === 'ne' ? (selectedService.name_ne || selectedService.name) : selectedService.name}
+              </h4>
+              <p className="text-sm text-gray-600 mb-2">
+                {language === 'ne' ? (selectedService.description_ne || selectedService.description) : selectedService.description}
+              </p>
+              {selectedService.base_price && (
+                <p className="text-rose-600 font-bold">
+                  NPR {selectedService.base_price}
+                  {selectedService.price_unit && ` / ${selectedService.price_unit}`}
+                </p>
+              )}
+            </div>
+
+            {/* Booking Form */}
+            <form onSubmit={handleBookingSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ne' ? 'बुकिङ मिति' : 'Booking Date'} *
+                  </label>
+                  <input
+                    type="date"
+                    value={bookingData.booking_date}
+                    onChange={(e) => setBookingData({...bookingData, booking_date: e.target.value})}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ne' ? 'अवधि (दिनहरू)' : 'Duration (Days)'} *
+                  </label>
+                  <input
+                    type="number"
+                    value={bookingData.duration_days}
+                    onChange={(e) => setBookingData({...bookingData, duration_days: parseInt(e.target.value)})}
+                    min="1"
+                    max="365"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ne' ? 'फोन नम्बर' : 'Phone Number'} *
+                </label>
+                <input
+                  type="tel"
+                  value={bookingData.client_phone}
+                  onChange={(e) => setBookingData({...bookingData, client_phone: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ne' ? 'ठेगाना' : 'Address'} *
+                </label>
+                <textarea
+                  value={bookingData.client_address}
+                  onChange={(e) => setBookingData({...bookingData, client_address: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  rows="2"
+                  placeholder={language === 'ne' ? 'तपाईंको पूर्ण ठेगाना प्रविष्ट गर्नुहोस्' : 'Enter your full address'}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ne' ? 'विशेष आवश्यकताहरू' : 'Special Requirements'}
+                </label>
+                <textarea
+                  value={bookingData.special_requirements}
+                  onChange={(e) => setBookingData({...bookingData, special_requirements: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  rows="3"
+                  placeholder={language === 'ne' ? 'कुनै विशेष आवश्यकता वा नोटहरू...' : 'Any special requirements or notes...'}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setSelectedService(null)}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition"
+                >
+                  {language === 'ne' ? 'रद्द गर्नुहोस्' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingBooking}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-lg hover:from-rose-600 hover:to-orange-600 font-medium disabled:opacity-50 transition"
+                >
+                  {submittingBooking ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader className="w-4 h-4 animate-spin" />
+                      {language === 'ne' ? 'बुक गर्दै...' : 'Booking...'}
+                    </span>
+                  ) : (
+                    language === 'ne' ? 'बुक पुष्टि गर्नुहोस्' : 'Confirm Booking'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -1150,6 +1461,9 @@ const Dashboard = () => {
           onTabChange={setActiveTab}
         />
       </div>
+
+      {/* Booking Modal */}
+      {renderBookingModal()}
     </div>
   );
 };

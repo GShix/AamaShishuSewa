@@ -9,9 +9,13 @@ import aiRoutes from './routes/ai.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
 import adminRoutes from './routes/admin/admin.js';
 import adminJobRoutes from './routes/admin/jobs.js';
+import adminReviewRoutes from './routes/admin/reviews.js';
 import userJobRoutes from './routes/user/jobs.js';
 import userBookingRoutes from './routes/user/bookings.js';
 import userServiceRoutes from './routes/user/services.js';
+import userPostRoutes from './routes/user/posts.js';
+import userReviewRoutes from './routes/user/reviews.js';
+import userNotificationRoutes from './routes/user/notifications.js';
 import debugRoutes from './routes/debug.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -54,6 +58,7 @@ app.get('/', (req, res) => {
       bookings: '/api/bookings',
       services: '/api/services',
       jobs: '/api/jobs',
+      posts: '/api/posts',
       admin: '/api/admin'
     }
   });
@@ -65,11 +70,15 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/jobs', userJobRoutes);
 app.use('/api/bookings', userBookingRoutes);
 app.use('/api/services', userServiceRoutes);
+app.use('/api/posts', userPostRoutes);
+app.use('/api/reviews', userReviewRoutes);
+app.use('/api/notifications', userNotificationRoutes);
 app.use('/api/debug', debugRoutes); // Temporary debug routes
 
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/jobs', adminJobRoutes);
+app.use('/api/admin/reviews', adminReviewRoutes);
 app.use('/api/admin', adminRoutes);
 
 // 404 handler - must come BEFORE error handler
