@@ -1,11 +1,6 @@
 // server/src/controllers/admin/noticeController.js
 import { supabaseAdmin } from '../../config/supabase.js';
 
-/**
- * Get all notices with optional filters
- * @route GET /api/admin/notices
- * @access Admin, SuperAdmin
- */
 export const getAllNotices = async (req, res) => {
   try {
     const { status, type } = req.query;
@@ -30,11 +25,6 @@ export const getAllNotices = async (req, res) => {
   }
 };
 
-/**
- * Create a new notice
- * @route POST /api/admin/notices
- * @access Admin, SuperAdmin
- */
 export const createNotice = async (req, res) => {
   try {
     const {
@@ -75,11 +65,6 @@ export const createNotice = async (req, res) => {
   }
 };
 
-/**
- * Update an existing notice
- * @route PUT /api/admin/notices/:id
- * @access Admin, SuperAdmin
- */
 export const updateNotice = async (req, res) => {
   try {
     const { id } = req.params;
@@ -108,11 +93,6 @@ export const updateNotice = async (req, res) => {
   }
 };
 
-/**
- * Delete a notice
- * @route DELETE /api/admin/notices/:id
- * @access Admin, SuperAdmin
- */
 export const deleteNotice = async (req, res) => {
   try {
     const { id } = req.params;

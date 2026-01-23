@@ -1,13 +1,6 @@
--- =====================================================
--- Migration: Create Admins Table
--- Description: Creates the admins table with proper constraints and RLS
--- Date: 2026-01-21
--- =====================================================
 
--- Drop table if exists (be careful in production)
 DROP TABLE IF EXISTS public.admins CASCADE;
 
--- Create admins table
 CREATE TABLE public.admins (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -21,7 +14,6 @@ CREATE TABLE public.admins (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_login TIMESTAMPTZ,
     
-    -- Constraints
     CONSTRAINT admins_role_check CHECK (role IN ('admin', 'superAdmin')),
     CONSTRAINT admins_status_check CHECK (status IN ('active', 'inactive', 'suspended')),
     CONSTRAINT admins_email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
@@ -50,11 +42,7 @@ CREATE TRIGGER update_admins_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- =====================================================
--- Row Level Security (RLS) Policies
--- =====================================================
-
--- Enable RLS
+-- Enable Row Level Security
 ALTER TABLE public.admins ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow service role full access (for backend operations)
@@ -161,12 +149,4 @@ COMMENT ON COLUMN public.admins.last_login IS 'Timestamp of last successful logi
 GRANT ALL ON public.admins TO service_role;
 GRANT SELECT, INSERT, UPDATE ON public.admins TO authenticated;
 
--- =====================================================
--- Verification Queries
--- =====================================================
 
--- Uncomment these to verify the table structure after migration
--- SELECT * FROM public.admins;
--- SELECT column_name, data_type, is_nullable, column_default
--- FROM information_schema.columns
--- WHERE table_schema = 'public' AND table_name = 'admins';

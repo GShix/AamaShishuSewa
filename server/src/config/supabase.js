@@ -69,13 +69,6 @@ export const supabaseHelpers = {
 // Public client with anon key (RLS enforced)
 export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-/**
- * Get user by ID
- */
 export const getUserById = async (userId) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -92,9 +85,6 @@ export const getUserById = async (userId) => {
   }
 };
 
-/**
- * Get user by email or phone
- */
 export const getUserByIdentifier = async (identifier) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -107,6 +97,68 @@ export const getUserByIdentifier = async (identifier) => {
     return data;
   } catch (error) {
     console.error('Get user by identifier error:', error);
+    return null;
+  }
+};
+
+/**
+ * Update user profile
+ */
+export const updateUser = async (userId, updates) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .update({
+        ...updates,
+        updated_at: new Date()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Update user error:', error);
+    return null;
+  }
+};
+
+/**
+ * Get all active services
+ */
+export const getActiveServices = async () => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('services')
+      .select('*')
+      .or('status.eq.active,is_active.eq.true')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Get active services error:', error);
+    return [];
+  }
+};
+
+/**
+ * Get service by ID
+ */
+export const getServiceById = async (serviceId) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('services')
+      .select('*')
+      .eq('id', serviceId)
+      .eq('is_active', true)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  } catch (error) {
+    console.error('Get service error:', error);
     return null;
   }
 };
@@ -126,6 +178,28 @@ export const getEmployeeById = async (empId) => {
     return data;
   } catch (error) {
     console.error('Get employee error:', error);
+    return null;
+  }
+};
+
+/**
+ * Create new booking
+ */
+export const createBooking = async (bookingData) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('bookings')
+      .insert({
+        ...bookingData,
+        created_at: new Date()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Create booking error:', error);
     return null;
   }
 };
@@ -189,9 +263,6 @@ export const getAvailableEmployees = async (serviceType, latitude, longitude, ra
   }
 };
 
-/**
- * Get all employees (for admin)
- */
 export const getAllEmployees = async () => {
   try {
     const { data, error } = await supabaseAdmin
@@ -207,9 +278,6 @@ export const getAllEmployees = async () => {
   }
 };
 
-/**
- * Get user bookings
- */
 export const getUserBookings = async (userId) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -233,9 +301,6 @@ export const getUserBookings = async (userId) => {
   }
 };
 
-/**
- * Get employee bookings
- */
 export const getEmployeeBookings = async (employeeId) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -258,9 +323,6 @@ export const getEmployeeBookings = async (employeeId) => {
   }
 };
 
-/**
- * Get conflicting bookings for an employee on a specific date
- */
 export const getConflictingBookings = async (employeeId, bookingDate) => {
   try {
     const dateStr = new Date(bookingDate).toISOString().split('T')[0];
@@ -280,9 +342,6 @@ export const getConflictingBookings = async (employeeId, bookingDate) => {
   }
 };
 
-/**
- * Update booking status
- */
 export const updateBookingStatus = async (bookingId, status) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -299,6 +358,29 @@ export const updateBookingStatus = async (bookingId, status) => {
     return data;
   } catch (error) {
     console.error('Update booking status error:', error);
+    return null;
+  }
+};
+
+/**
+ * Update booking with any fields
+ */
+export const updateBooking = async (bookingId, updates) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('bookings')
+      .update({
+        ...updates,
+        updated_at: new Date()
+      })
+      .eq('id', bookingId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Update booking error:', error);
     return null;
   }
 };
@@ -327,9 +409,6 @@ export const assignEmployeeToBooking = async (bookingId, employeeId) => {
   }
 };
 
-/**
- * Create care plan
- */
 export const createCarePlan = async (bookingId, planData) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -356,9 +435,6 @@ export const createCarePlan = async (bookingId, planData) => {
   }
 };
 
-/**
- * Get care plan for booking
- */
 export const getCarePlan = async (bookingId) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -403,13 +479,7 @@ const toRad = (degrees) => {
   return degrees * (Math.PI / 180);
 };
 
-// ============================================================================
-// STATISTICS & ANALYTICS
-// ============================================================================
 
-/**
- * Get dashboard statistics
- */
 export const getDashboardStats = async () => {
   try {
     // Total users
@@ -459,36 +529,34 @@ export const getDashboardStats = async () => {
   }
 };
 
-
-// Backward compatibility aliases (deprecated - use employee versions)
-export const getProfessionalById = getEmployeeById;
-export const getAvailableProfessionals = getAvailableEmployees;
-export const getAllProfessionals = getAllEmployees;
-export const getProfessionalBookings = getEmployeeBookings;
-export const assignProfessionalToBooking = assignEmployeeToBooking;
-
 export default {
   supabaseAdmin,
   supabaseClient,
+  supabaseHelpers,
+  // User functions
   getUserById,
   getUserByIdentifier,
+  updateUser,
+  // Service functions
+  getActiveServices,
+  getServiceById,
+  // Employee functions
   getEmployeeById,
-  getBookingById,
   getAvailableEmployees,
   getAllEmployees,
-  getUserBookings,
   getEmployeeBookings,
-  getConflictingBookings,
+  // Booking functions
+  createBooking,
+  getBookingById,
+  getUserBookings,
+  updateBooking,
   updateBookingStatus,
   assignEmployeeToBooking,
+  getConflictingBookings,
+  // Care plan functions
   createCarePlan,
   getCarePlan,
+  // Utility functions
   calculateDistance,
-  getDashboardStats,
-  // Backward compatibility (deprecated)
-  getProfessionalById,
-  getAvailableProfessionals,
-  getAllProfessionals,
-  getProfessionalBookings,
-  assignProfessionalToBooking
+  getDashboardStats
 };

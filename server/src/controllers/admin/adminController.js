@@ -2,16 +2,6 @@
 import { supabaseAdmin } from '../../config/supabase.js';
 import bcrypt from 'bcryptjs';
 
-/**
- * Admin Management Controller
- * Handles admin-specific operations and dashboard statistics
- */
-
-/**
- * Get all admins with filters and pagination
- * @route GET /api/admin/admins
- * @access SuperAdmin
- */
 export const getAllAdmins = async (req, res) => {
   try {
     const { role, status, search, page = 1, limit = 10 } = req.query;
@@ -56,11 +46,6 @@ export const getAllAdmins = async (req, res) => {
   }
 };
 
-/**
- * Get a single admin by ID
- * @route GET /api/admin/admins/:id
- * @access SuperAdmin
- */
 export const getAdminById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,11 +70,6 @@ export const getAdminById = async (req, res) => {
   }
 };
 
-/**
- * Create a new admin
- * @route POST /api/admin/admins
- * @access SuperAdmin
- */
 export const createAdmin = async (req, res) => {
   try {
     const { email, password, fullName, phone, role, status = 'active' } = req.body;
@@ -156,11 +136,6 @@ export const createAdmin = async (req, res) => {
   }
 };
 
-/**
- * Update an admin
- * @route PUT /api/admin/admins/:id
- * @access SuperAdmin
- */
 export const updateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -218,11 +193,6 @@ export const updateAdmin = async (req, res) => {
   }
 };
 
-/**
- * Update admin password
- * @route PUT /api/admin/admins/:id/password
- * @access SuperAdmin
- */
 export const updateAdminPassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -253,11 +223,6 @@ export const updateAdminPassword = async (req, res) => {
   }
 };
 
-/**
- * Delete or deactivate an admin
- * @route DELETE /api/admin/admins/:id
- * @access SuperAdmin
- */
 export const deleteAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -295,11 +260,6 @@ export const deleteAdmin = async (req, res) => {
   }
 };
 
-/**
- * Get admin statistics
- * @route GET /api/admin/admins/stats
- * @access Admin, SuperAdmin
- */
 export const getAdminStats = async (req, res) => {
   try {
     const { data: admins, error } = await supabaseAdmin
@@ -327,11 +287,6 @@ export const getAdminStats = async (req, res) => {
   }
 };
 
-/**
- * Get dashboard statistics
- * @route GET /api/admin/dashboard
- * @access Admin, SuperAdmin
- */
 export const getDashboardStats = async (req, res) => {
   try {
     // Get total users

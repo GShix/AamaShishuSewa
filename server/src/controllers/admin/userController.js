@@ -1,11 +1,6 @@
 // server/src/controllers/admin/userController.js
 import { supabaseAdmin } from '../../config/supabase.js';
 
-/**
- * Get all users with optional filters
- * @route GET /api/admin/users
- * @access Admin, SuperAdmin
- */
 export const getAllUsers = async (req, res) => {
   try {
     const { role, status, search, page = 1, limit = 10 } = req.query;
@@ -45,11 +40,6 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-/**
- * Get a single user by ID
- * @route GET /api/admin/users/:id
- * @access Admin, SuperAdmin
- */
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,11 +63,6 @@ export const getUserById = async (req, res) => {
   }
 };
 
-/**
- * Update user status
- * @route PATCH /api/admin/users/:id/status
- * @access Admin, SuperAdmin
- */
 export const updateUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -150,11 +135,6 @@ export const updateUserStatus = async (req, res) => {
   }
 };
 
-/**
- * Delete a user
- * @route DELETE /api/admin/users/:id
- * @access Admin, SuperAdmin
- */
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;

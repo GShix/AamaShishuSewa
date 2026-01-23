@@ -1,11 +1,6 @@
 // server/src/controllers/admin/serviceController.js
 import { supabaseAdmin } from '../../config/supabase.js';
 
-/**
- * Get all services with optional filters
- * @route GET /api/admin/services
- * @access Admin, SuperAdmin
- */
 export const getAllServices = async (req, res) => {
   try {
     const { category, status } = req.query;
@@ -30,11 +25,6 @@ export const getAllServices = async (req, res) => {
   }
 };
 
-/**
- * Create a new service
- * @route POST /api/admin/services
- * @access Admin, SuperAdmin
- */
 export const createService = async (req, res) => {
   try {
     const {
@@ -76,11 +66,6 @@ export const createService = async (req, res) => {
   }
 };
 
-/**
- * Update an existing service
- * @route PUT /api/admin/services/:id
- * @access Admin, SuperAdmin
- */
 export const updateService = async (req, res) => {
   try {
     const { id } = req.params;
@@ -108,11 +93,6 @@ export const updateService = async (req, res) => {
   }
 };
 
-/**
- * Delete a service
- * @route DELETE /api/admin/services/:id
- * @access Admin, SuperAdmin
- */
 export const deleteService = async (req, res) => {
   try {
     const { id } = req.params;

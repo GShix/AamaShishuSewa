@@ -1,10 +1,4 @@
--- =====================================================
--- Migration: Create Users Table
--- Description: Creates the users table with proper constraints and RLS
--- Date: 2026-01-21
--- =====================================================
 
--- Drop table if exists (be careful in production)
 DROP TABLE IF EXISTS public.users CASCADE;
 
 -- Create users table
@@ -44,10 +38,6 @@ CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON public.users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
-
--- =====================================================
--- Row Level Security (RLS) Policies
--- =====================================================
 
 -- Enable RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;

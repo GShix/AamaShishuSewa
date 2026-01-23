@@ -87,12 +87,6 @@ router.post('/employees', createEmployee);
 router.put('/employees/:id', updateEmployee);
 router.delete('/employees/:id', deleteEmployee);
 
-// Backward compatibility: professionals -> employees
-router.get('/professionals', getAllEmployees);
-router.post('/professionals', createEmployee);
-router.put('/professionals/:id', updateEmployee);
-router.delete('/professionals/:id', deleteEmployee);
-
 // SERVICES MANAGEMENT
 
 router.get('/services', getAllServices);
