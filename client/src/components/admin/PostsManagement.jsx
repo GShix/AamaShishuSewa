@@ -1,6 +1,6 @@
 // client/src/components/admin/PostsManagement.jsx
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, RefreshCw, X, Image, FileText, Eye, Calendar, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, RefreshCw, X, Image, FileText, Eye, Calendar, Tag, Upload } from 'lucide-react';
 import { adminAPI } from '../../utils/api';
 
 const PostsManagement = () => {
@@ -9,6 +9,10 @@ const PostsManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imageData, setImageData] = useState(null);
+  const [imageType, setImageType] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -19,6 +23,7 @@ const PostsManagement = () => {
     image_url: '',
     published: true
   });
+
 
   useEffect(() => {
     fetchPosts();
@@ -44,6 +49,12 @@ const PostsManagement = () => {
         ...formData,
         tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)
       };
+
+      // Include image data if available
+      if (imageData && imageType) {
+        data.image_data = imageData;
+        data.image_type = imageType;
+      }
 
       if (editingId) {
         await adminAPI.updatePost(editingId, data);
@@ -74,7 +85,15 @@ const PostsManagement = () => {
       image_url: post.image_url || '',
       published: post.published !== false
     });
-    setImagePreview(post.image_url);
+    
+    // Set image preview URL if post has image
+    if (post.image_preview_url) {
+      const serverUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000';
+      setImagePreview(`${serverUrl}${post.image_preview_url}`);
+    } else if (post.image_url) {
+      setImagePreview(post.image_url);
+    }
+    
     setEditingId(post.id);
     setShowModal(true);
   };
@@ -98,6 +117,59 @@ const PostsManagement = () => {
     setImagePreview(url);
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+        return;
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      setSelectedFile(file);
+      // Show preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!selectedFile) {
+      alert('Please select an image first');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const formDataToUpload = new FormData();
+      formDataToUpload.append('image', selectedFile);
+
+      const response = await adminAPI.uploadPostImage(formDataToUpload);
+      
+      // Store the base64 image data and type
+      setImageData(response.data.imageData);
+      setImageType(response.data.imageType);
+      setImagePreview(response.data.dataUrl);
+      
+      alert('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert(error.response?.data?.error || 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -110,6 +182,9 @@ const PostsManagement = () => {
       published: true
     });
     setImagePreview(null);
+    setSelectedFile(null);
+    setImageData(null);
+    setImageType(null);
   };
 
   const getCategoryBadge = (category) => {
@@ -181,13 +256,30 @@ const PostsManagement = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
+          {posts.map((post) => {
+            const serverUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000';
+            const imageUrl = post.image_preview_url 
+              ? `${serverUrl}${post.image_preview_url}` 
+              : post.image_url;
+            
+            // Debug logging
+            if (post.has_image || post.image_preview_url) {
+              console.log('Post Image Debug:', {
+                id: post.id,
+                has_image: post.has_image,
+                image_preview_url: post.image_preview_url,
+                serverUrl,
+                finalImageUrl: imageUrl
+              });
+            }
+            
+            return (
             <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               {/* Post Image */}
-              {post.image_url && (
+              {(imageUrl || post.has_image) && (
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img 
-                    src={post.image_url} 
+                    src={imageUrl} 
                     alt={post.title}
                     className="w-full h-full object-cover"
                     onError={(e) => e.target.src = 'https://via.placeholder.com/400x300?text=No+Image'}
@@ -258,7 +350,8 @@ const PostsManagement = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -353,17 +446,59 @@ const PostsManagement = () => {
               {/* Image URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Featured Image URL
+                  Featured Image
                 </label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={handleImageChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                  placeholder="https://example.com/image.jpg"
-                />
+                
+                {/* File Upload Option */}
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="imageUpload"
+                    />
+                    <label
+                      htmlFor="imageUpload"
+                      className="flex-1 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg hover:border-rose-400 cursor-pointer flex items-center justify-center gap-2 transition"
+                    >
+                      <Upload className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-600">
+                        {selectedFile ? selectedFile.name : 'Choose Image File'}
+                      </span>
+                    </label>
+                    {selectedFile && (
+                      <button
+                        type="button"
+                        onClick={handleUploadImage}
+                        disabled={uploadingImage}
+                        className="px-4 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg hover:from-rose-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {uploadingImage ? 'Uploading...' : 'Upload'}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* OR Divider */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <span className="text-xs text-gray-500 font-medium">OR</span>
+                    <div className="flex-1 border-t border-gray-300"></div>
+                  </div>
+                  
+                  {/* URL Input Option */}
+                  <input
+                    type="url"
+                    value={formData.image_url}
+                    onChange={handleImageChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    placeholder="Or paste image URL: https://example.com/image.jpg"
+                  />
+                </div>
+
                 {imagePreview && (
-                  <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
+                  <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 relative">
                     <img 
                       src={imagePreview} 
                       alt="Preview" 
@@ -372,6 +507,19 @@ const PostsManagement = () => {
                         e.target.src = 'https://via.placeholder.com/400x300?text=Invalid+Image+URL';
                       }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setSelectedFile(null);
+                        setImageData(null);
+                        setImageType(null);
+                        setFormData({ ...formData, image_url: '' });
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
               </div>

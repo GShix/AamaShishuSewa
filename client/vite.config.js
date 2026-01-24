@@ -109,7 +109,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'https://aamashishu-sewa.vercel.app',
-        target: 'http://localhost:6000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       }

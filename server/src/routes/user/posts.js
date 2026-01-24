@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 
     let query = supabaseAdmin
       .from('posts')
-      .select('*')
+      .select('id, title, content, excerpt, category, priority, tags, image_type, image_url, published, author_id, views, created_at, updated_at, published_at')
       .eq('published', true);
 
     if (category) {
@@ -26,7 +26,14 @@ router.get('/', async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json({ posts: posts || [] });
+    // Add image URL for posts with image_data
+    const postsWithImageUrls = posts.map(post => ({
+      ...post,
+      has_image: !!post.image_type,
+      image_preview_url: post.image_type ? `/api/posts/${post.id}/image` : post.image_url
+    }));
+
+    res.status(200).json({ posts: postsWithImageUrls });
   } catch (error) {
     console.error('Get posts error:', error);
     res.status(500).json({ error: 'Failed to fetch posts' });
@@ -61,6 +68,36 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Get post error:', error);
     res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
+// Get post image (public)
+router.get('/:id/image', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: post, error } = await supabaseAdmin
+      .from('posts')
+      .select('image_data, image_type')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    if (!post || !post.image_data) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Convert base64 string back to binary buffer
+    const imageBuffer = Buffer.from(post.image_data, 'base64');
+
+    // Set content type and send binary data
+    res.set('Content-Type', post.image_type || 'image/jpeg');
+    res.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.send(imageBuffer);
+  } catch (error) {
+    console.error('Get post image error:', error);
+    res.status(500).json({ error: 'Failed to retrieve image' });
   }
 });
 

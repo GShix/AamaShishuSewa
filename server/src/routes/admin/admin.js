@@ -44,10 +44,12 @@ import {
   getAllPosts,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getPostImage
 } from '../../controllers/admin/postController.js';
 
 import { authenticate, requireAdmin, requireSuperAdmin } from '../../middleware/auth.js';
+import { uploadPostImage, handleUploadError } from '../../middleware/upload.js';
 
 const router = express.Router();
 
@@ -99,6 +101,35 @@ router.get('/posts', getAllPosts);
 router.post('/posts', createPost);
 router.put('/posts/:id', updatePost);
 router.delete('/posts/:id', deletePost);
+router.get('/posts/:id/image', getPostImage);
+
+// FILE UPLOAD for posts
+router.post('/upload/post-image', uploadPostImage.single('image'), handleUploadError, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Read the file and convert to base64
+    const fs = await import('fs');
+    const imageBuffer = fs.readFileSync(req.file.path);
+    const base64Image = imageBuffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+    
+    // Delete the temporary file
+    fs.unlinkSync(req.file.path);
+    
+    res.status(200).json({
+      message: 'Image uploaded successfully',
+      imageData: base64Image,
+      imageType: req.file.mimetype,
+      dataUrl: dataUrl
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
 
 export default router;
 

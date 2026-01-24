@@ -4,6 +4,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import authRoutes from './routes/user/userAuth.js';
 import aiRoutes from './routes/ai.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
@@ -22,8 +25,11 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(helmet({
@@ -41,8 +47,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // Increased limit for base64 image uploads
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded files as static content
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Handle preflight requests
 app.options('*', cors());

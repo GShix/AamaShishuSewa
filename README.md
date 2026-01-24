@@ -160,7 +160,7 @@ Create a `.env` file in the `client/` directory:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:8000
 ```
 
 ### Server Environment Variables
@@ -168,7 +168,7 @@ Create a `.env` file in the `server/` directory:
 
 ```env
 # Server Configuration
-PORT=5000
+PORT=8000
 NODE_ENV=development
 
 # Supabase

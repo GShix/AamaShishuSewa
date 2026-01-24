@@ -738,14 +738,21 @@ const Dashboard = () => {
         </div>
       ) : (
         <div className="space-y-4 lg:space-y-6">
-          {posts.map((post) => (
+          {posts.map((post) => {
+            const serverUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000';
+            const imageUrl = post.image_preview_url 
+              ? `${serverUrl}${post.image_preview_url}` 
+              : post.image_url;
+            
+            return (
             <div key={post.id} className="bg-white rounded-xl lg:rounded-2xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-              {post.image_url && (
-                <div className="h-48 lg:h-64 overflow-hidden">
+              {(imageUrl || post.has_image) && (
+                <div className="h-48 lg:h-64 overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
                   <img 
-                    src={post.image_url} 
+                    src={imageUrl} 
                     alt={post.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => e.target.src = 'https://via.placeholder.com/800x400?text=Post+Image'}
                   />
                 </div>
               )}
@@ -814,7 +821,8 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

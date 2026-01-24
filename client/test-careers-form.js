@@ -63,7 +63,7 @@ const testCase4 = {
   shift: 'Evening',
   citizenship: 'Yes',
   area: 'All over Kathmandu Valley',
-  salary: '5000 per ceremony',
+  salary: '8000 per ceremony',
   notes: 'सम्पूर्ण धार्मिक विधि अनुसार न्वारन गराउँछु।'
 };
 

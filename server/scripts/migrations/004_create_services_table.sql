@@ -59,7 +59,7 @@ INSERT INTO services (name, description, category, price, pricing_type, duration
     'Prenatal Consultation',
     'Expert prenatal care and consultation for expecting mothers',
     'prenatal',
-    5000.00,
+    8000.00,
     'fixed',
     60,
     '["Health check-up", "Diet planning", "Exercise guidance", "Mental health support"]'::jsonb

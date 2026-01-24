@@ -104,6 +104,11 @@ export const adminAPI = {
   createPost: (data) => api.post('/admin/posts', data),
   updatePost: (id, data) => api.put(`/admin/posts/${id}`, data),
   deletePost: (id) => api.delete(`/admin/posts/${id}`),
+  uploadPostImage: (formData) => api.post('/admin/upload/post-image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   
   // Jobs Management
   getJobs: (params) => api.get('/admin/jobs', { params }),
