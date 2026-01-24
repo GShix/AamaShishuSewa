@@ -66,18 +66,18 @@ npm run dev
 ### Test Admin Management (SuperAdmin only)
 ```bash
 # Login as SuperAdmin
-POST http://localhost:6000/api/admin/auth/login
+POST http://localhost:8000/api/admin/auth/login
 {
   "email": "superadmin@example.com",
   "password": "SuperAdmin@123"
 }
 
 # Get all admins
-GET http://localhost:6000/api/admin/admins
+GET http://localhost:8000/api/admin/admins
 Headers: { "Authorization": "Bearer <token>" }
 
 # Create admin
-POST http://localhost:6000/api/admin/admins
+POST http://localhost:8000/api/admin/admins
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "email": "newadmin@example.com",
@@ -91,11 +91,11 @@ Body: {
 ### Test Notice Management
 ```bash
 # Get all notices
-GET http://localhost:6000/api/admin/notices
+GET http://localhost:8000/api/admin/notices
 Headers: { "Authorization": "Bearer <token>" }
 
 # Create notice
-POST http://localhost:6000/api/admin/notices
+POST http://localhost:8000/api/admin/notices
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "title": "Important Notice",
@@ -106,25 +106,25 @@ Body: {
 }
 
 # Update notice
-PUT http://localhost:6000/api/admin/notices/:id
+PUT http://localhost:8000/api/admin/notices/:id
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "status": "inactive"
 }
 
 # Delete notice
-DELETE http://localhost:6000/api/admin/notices/:id
+DELETE http://localhost:8000/api/admin/notices/:id
 Headers: { "Authorization": "Bearer <token>" }
 ```
 
 ### Test Service Management
 ```bash
 # Get all services
-GET http://localhost:6000/api/admin/services
+GET http://localhost:8000/api/admin/services
 Headers: { "Authorization": "Bearer <token>" }
 
 # Create service
-POST http://localhost:6000/api/admin/services
+POST http://localhost:8000/api/admin/services
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "name": "Prenatal Care",
@@ -138,11 +138,11 @@ Body: {
 ### Test Professional Management
 ```bash
 # Get all professionals
-GET http://localhost:6000/api/admin/professionals
+GET http://localhost:8000/api/admin/professionals
 Headers: { "Authorization": "Bearer <token>" }
 
 # Create professional
-POST http://localhost:6000/api/admin/professionals
+POST http://localhost:8000/api/admin/professionals
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "fullName": "Dr. Jane Doe",
@@ -158,11 +158,11 @@ Body: {
 ### Test Booking Management
 ```bash
 # Get all bookings
-GET http://localhost:6000/api/admin/bookings
+GET http://localhost:8000/api/admin/bookings
 Headers: { "Authorization": "Bearer <token>" }
 
 # Update booking status
-PUT http://localhost:6000/api/admin/bookings/:id/status
+PUT http://localhost:8000/api/admin/bookings/:id/status
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "status": "confirmed"
@@ -172,15 +172,15 @@ Body: {
 ### Test User Management
 ```bash
 # Get all users
-GET http://localhost:6000/api/admin/users
+GET http://localhost:8000/api/admin/users
 Headers: { "Authorization": "Bearer <token>" }
 
 # Get user by ID
-GET http://localhost:6000/api/admin/users/:id
+GET http://localhost:8000/api/admin/users/:id
 Headers: { "Authorization": "Bearer <token>" }
 
 # Update user status
-PUT http://localhost:6000/api/admin/users/:id/status
+PUT http://localhost:8000/api/admin/users/:id/status
 Headers: { "Authorization": "Bearer <token>" }
 Body: {
   "status": "suspended"
@@ -190,7 +190,7 @@ Body: {
 ### Test Dashboard
 ```bash
 # Get dashboard stats
-GET http://localhost:6000/api/admin/dashboard/stats
+GET http://localhost:8000/api/admin/dashboard/stats
 Headers: { "Authorization": "Bearer <token>" }
 ```
 

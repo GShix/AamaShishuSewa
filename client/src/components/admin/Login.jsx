@@ -66,7 +66,7 @@ const AdminLogin = () => {
       
       // Provide specific error messages based on error type
       if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-        setError('Cannot connect to server. Please ensure the backend server is running on port 6000.');
+        setError('Cannot connect to server. Please ensure the backend server is running on port 8000.');
       } else if (err.response?.status === 401) {
         setError(err.response?.data?.error || 'Invalid email or password.');
       } else if (err.response?.status === 403) {

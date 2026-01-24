@@ -20,7 +20,7 @@ Admins can now upload images directly when creating or editing posts in the admi
 
 3. **Static File Serving**
    - Configured Express to serve files from `/uploads` directory
-   - Images accessible at: `http://localhost:6000/uploads/posts/filename.jpg`
+   - Images accessible at: `http://localhost:8000/uploads/posts/filename.jpg`
 
 ### Frontend (Client)
 1. **PostsManagement Component** (`client/src/components/admin/PostsManagement.jsx`)

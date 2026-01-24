@@ -215,7 +215,7 @@ npm run dev
 
 ### 4. Test Login
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/login \
+curl -X POST http://localhost:8000/api/admin/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "dambarsinggharti@gmail.com", "password": "SuperAdmin@123456"}'
 ```

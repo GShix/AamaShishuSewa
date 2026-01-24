@@ -35,7 +35,7 @@ npm run dev
 
 **Option 2: Using API (Postman/cURL)**
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/register \
+curl -X POST http://localhost:8000/api/admin/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@example.com",
@@ -135,7 +135,7 @@ PUT    /api/admin/auth/change-password    - Change password (protected)
 
 ### Test Registration:
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/register \
+curl -X POST http://localhost:8000/api/admin/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@admin.com",
@@ -149,7 +149,7 @@ curl -X POST http://localhost:6000/api/admin/auth/register \
 
 ### Test Login:
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/login \
+curl -X POST http://localhost:8000/api/admin/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@admin.com",
@@ -163,7 +163,7 @@ curl -X POST http://localhost:6000/api/admin/auth/login \
 
 ### Port Issues
 - Frontend: http://localhost:5173
-- Backend: http://localhost:6000
+- Backend: http://localhost:8000
 
 ### Secret Key Error
 Make sure the secret key in registration form matches `ADMIN_REGISTRATION_SECRET` in `.env`

@@ -36,7 +36,7 @@ You should see:
 ### 3️⃣ Test Login
 
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/login \
+curl -X POST http://localhost:8000/api/admin/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "dambarsinggharti@gmail.com",
@@ -51,7 +51,7 @@ From the response, copy the `token` value.
 ### 5️⃣ Test SuperAdmin Access
 
 ```bash
-curl -X GET http://localhost:6000/api/admin/admins \
+curl -X GET http://localhost:8000/api/admin/admins \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 

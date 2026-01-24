@@ -7,7 +7,7 @@
 cd server
 npm run dev
 ```
-Server should be running on `http://localhost:6000`
+Server should be running on `http://localhost:8000`
 
 ### Step 2: Ensure Client is Running
 ```bash
@@ -164,7 +164,7 @@ Client should be running on `http://localhost:5173`
 - Clear browser cache and try again
 
 ### **Dashboard Not Loading**
-- Check server is running (port 6000)
+- Check server is running (port 8000)
 - Check client is running (port 5173)
 - Open browser console for errors
 
@@ -212,7 +212,7 @@ Make sure your Supabase database has these tables:
 
 ## ✅ First Time Setup Checklist
 
-1. [ ] Server running on port 6000
+1. [ ] Server running on port 8000
 2. [ ] Client running on port 5173
 3. [ ] Admin account created
 4. [ ] Successfully logged in

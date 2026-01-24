@@ -51,7 +51,7 @@ Use this checklist to ensure proper setup of the admin system.
 - [ ] Start server: `npm run dev`
 - [ ] Test login endpoint:
   ```bash
-  curl -X POST http://localhost:6000/api/admin/auth/login \
+  curl -X POST http://localhost:8000/api/admin/auth/login \
     -H "Content-Type: application/json" \
     -d '{"email": "dambarsinggharti@gmail.com", "password": "SuperAdmin@123456"}'
   ```
@@ -65,7 +65,7 @@ Use this checklist to ensure proper setup of the admin system.
 ### Test Admin Login
 - [ ] Test login endpoint:
   ```bash
-  curl -X POST http://localhost:6000/api/admin/auth/login \
+  curl -X POST http://localhost:8000/api/admin/auth/login \
     -H "Content-Type: application/json" \
     -d '{"email": "aamasisiusewa@gmail.com", "password": "Admin@123456"}'
   ```
@@ -78,13 +78,13 @@ Use this checklist to ensure proper setup of the admin system.
 ### Test SuperAdmin Endpoints
 - [ ] Get all admins:
   ```bash
-  curl -X GET http://localhost:6000/api/admin/admins \
+  curl -X GET http://localhost:8000/api/admin/admins \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN"
   ```
 - [ ] Verify can see all admins
 - [ ] Get admin stats:
   ```bash
-  curl -X GET http://localhost:6000/api/admin/admins/stats \
+  curl -X GET http://localhost:8000/api/admin/admins/stats \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN"
   ```
 - [ ] Verify statistics are returned
@@ -92,7 +92,7 @@ Use this checklist to ensure proper setup of the admin system.
 ### Test Admin Restrictions
 - [ ] Try to access admin management with regular admin token:
   ```bash
-  curl -X GET http://localhost:6000/api/admin/admins \
+  curl -X GET http://localhost:8000/api/admin/admins \
     -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
   ```
 - [ ] Verify returns 403 Forbidden
@@ -100,13 +100,13 @@ Use this checklist to ensure proper setup of the admin system.
 ### Test Profile Endpoints
 - [ ] Get own profile:
   ```bash
-  curl -X GET http://localhost:6000/api/admin/auth/profile \
+  curl -X GET http://localhost:8000/api/admin/auth/profile \
     -H "Authorization: Bearer YOUR_TOKEN"
   ```
 - [ ] Verify profile data returned
 - [ ] Update profile:
   ```bash
-  curl -X PUT http://localhost:6000/api/admin/auth/profile \
+  curl -X PUT http://localhost:8000/api/admin/auth/profile \
     -H "Authorization: Bearer YOUR_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"fullName": "Updated Name"}'
@@ -118,7 +118,7 @@ Use this checklist to ensure proper setup of the admin system.
 ### Create Admin
 - [ ] Create new admin:
   ```bash
-  curl -X POST http://localhost:6000/api/admin/admins \
+  curl -X POST http://localhost:8000/api/admin/admins \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
@@ -138,7 +138,7 @@ Use this checklist to ensure proper setup of the admin system.
 ### Update Admin
 - [ ] Update admin details:
   ```bash
-  curl -X PUT http://localhost:6000/api/admin/admins/ADMIN_ID \
+  curl -X PUT http://localhost:8000/api/admin/admins/ADMIN_ID \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"fullName": "Updated Admin Name"}'
@@ -148,7 +148,7 @@ Use this checklist to ensure proper setup of the admin system.
 ### Delete Admin (Soft Delete)
 - [ ] Soft delete admin:
   ```bash
-  curl -X DELETE http://localhost:6000/api/admin/admins/ADMIN_ID \
+  curl -X DELETE http://localhost:8000/api/admin/admins/ADMIN_ID \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN"
   ```
 - [ ] Verify status changed to 'inactive'
@@ -175,7 +175,7 @@ Use this checklist to ensure proper setup of the admin system.
 - [ ] Test invalid email format
   ```bash
   # Should return 400 error
-  curl -X POST http://localhost:6000/api/admin/admins \
+  curl -X POST http://localhost:8000/api/admin/admins \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"email": "invalid-email", "password": "Test123", "fullName": "Test", "phone": "1234567890", "role": "admin"}'
@@ -190,7 +190,7 @@ Use this checklist to ensure proper setup of the admin system.
 
 - [ ] Change SuperAdmin password:
   ```bash
-  curl -X PUT http://localhost:6000/api/admin/auth/change-password \
+  curl -X PUT http://localhost:8000/api/admin/auth/change-password \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"currentPassword": "SuperAdmin@123456", "newPassword": "NewSecurePass@2026"}'
@@ -199,7 +199,7 @@ Use this checklist to ensure proper setup of the admin system.
 - [ ] Verify new password works
 - [ ] Test SuperAdmin resetting another admin's password:
   ```bash
-  curl -X PUT http://localhost:6000/api/admin/admins/ADMIN_ID/password \
+  curl -X PUT http://localhost:8000/api/admin/admins/ADMIN_ID/password \
     -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"newPassword": "ResetPass@123"}'

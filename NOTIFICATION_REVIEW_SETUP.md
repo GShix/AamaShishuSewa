@@ -53,7 +53,7 @@ Check terminal output for:
 ```
 ✅ Email service configured
 ✅ SMS service configured (or warning if not configured)
-🚀 Server running on port 6000
+🚀 Server running on port 8000
 ```
 
 ## Step 4: Test Notifications

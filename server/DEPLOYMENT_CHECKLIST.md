@@ -16,7 +16,7 @@
 - [ ] `JWT_SECRET` is set (strong secret key)
 - [ ] `JWT_EXPIRES_IN` is set (default: 7d)
 - [ ] `ADMIN_REGISTRATION_SECRET` is set (change default!)
-- [ ] `PORT` is set (default: 6000)
+- [ ] `PORT` is set (default: 8000)
 - [ ] `NODE_ENV` is set (production/development)
 
 ### Initial Data

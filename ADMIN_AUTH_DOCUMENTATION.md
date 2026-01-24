@@ -181,7 +181,7 @@ users:
 
 **Backend Request:**
 ```bash
-POST http://localhost:6000/api/admin/auth/register
+POST http://localhost:8000/api/admin/auth/register
 Content-Type: application/json
 
 {
@@ -223,7 +223,7 @@ Content-Type: application/json
 
 **Backend Request:**
 ```bash
-POST http://localhost:6000/api/admin/auth/login
+POST http://localhost:8000/api/admin/auth/login
 Content-Type: application/json
 
 {
@@ -295,7 +295,7 @@ router.get('/super-admin-route', authenticate, requireSuperAdmin, controller);
 
 ### Test Admin Registration:
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/register \
+curl -X POST http://localhost:8000/api/admin/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@admin.com",
@@ -309,7 +309,7 @@ curl -X POST http://localhost:6000/api/admin/auth/register \
 
 ### Test Admin Login:
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/login \
+curl -X POST http://localhost:8000/api/admin/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@admin.com",
@@ -319,7 +319,7 @@ curl -X POST http://localhost:6000/api/admin/auth/login \
 
 ### Test Protected Route:
 ```bash
-curl -X GET http://localhost:6000/api/admin/auth/profile \
+curl -X GET http://localhost:8000/api/admin/auth/profile \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN_HERE"
 ```
 

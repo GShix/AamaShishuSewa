@@ -282,14 +282,14 @@ The dashboard automatically displays:
 
 ### **Get Dashboard Stats**
 ```javascript
-const response = await axios.get('http://localhost:6000/api/admin/dashboard/stats', {
+const response = await axios.get('http://localhost:8000/api/admin/dashboard/stats', {
   headers: { Authorization: `Bearer ${adminToken}` }
 });
 ```
 
 ### **Create Professional**
 ```javascript
-await axios.post('http://localhost:6000/api/admin/professionals', {
+await axios.post('http://localhost:8000/api/admin/professionals', {
   fullName: 'Dr. Jane Smith',
   email: 'jane@example.com',
   phone: '9800000000',
@@ -303,7 +303,7 @@ await axios.post('http://localhost:6000/api/admin/professionals', {
 
 ### **Update Booking Status**
 ```javascript
-await axios.patch(`http://localhost:6000/api/admin/bookings/${bookingId}/status`, {
+await axios.patch(`http://localhost:8000/api/admin/bookings/${bookingId}/status`, {
   status: 'confirmed',
   notes: 'Appointment confirmed'
 }, {
@@ -352,7 +352,7 @@ Update Tailwind classes in components for different color schemes.
 ## 🐛 Troubleshooting
 
 ### **Dashboard Not Loading**
-- Check if server is running on port 6000
+- Check if server is running on port 8000
 - Verify admin token is in localStorage
 - Check browser console for errors
 

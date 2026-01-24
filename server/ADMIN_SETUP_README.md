@@ -105,7 +105,7 @@ SELECT * FROM public.admins;
 
 2. Test login endpoint:
 ```bash
-POST http://localhost:6000/api/admin/auth/login
+POST http://localhost:8000/api/admin/auth/login
 Content-Type: application/json
 
 {
@@ -337,7 +337,7 @@ JWT_EXPIRES_IN=7d
 ADMIN_REGISTRATION_SECRET=admin-secret-key-2026
 
 # Server Configuration
-PORT=6000
+PORT=8000
 NODE_ENV=development
 ```
 
@@ -345,7 +345,7 @@ NODE_ENV=development
 
 ### Test Admin Login
 ```bash
-curl -X POST http://localhost:6000/api/admin/auth/login \
+curl -X POST http://localhost:8000/api/admin/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "dambarsinggharti@gmail.com",
@@ -355,13 +355,13 @@ curl -X POST http://localhost:6000/api/admin/auth/login \
 
 ### Test Get All Admins (SuperAdmin)
 ```bash
-curl -X GET "http://localhost:6000/api/admin/admins?page=1&limit=10" \
+curl -X GET "http://localhost:8000/api/admin/admins?page=1&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### Test Create Admin (SuperAdmin)
 ```bash
-curl -X POST http://localhost:6000/api/admin/admins \
+curl -X POST http://localhost:8000/api/admin/admins \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_SUPERADMIN_TOKEN" \
   -d '{
