@@ -21,6 +21,7 @@ import userPostRoutes from './routes/user/posts.js';
 import userReviewRoutes from './routes/user/reviews.js';
 import userNotificationRoutes from './routes/user/notifications.js';
 import debugRoutes from './routes/debug.js';
+import { getPostImage } from './controllers/admin/postController.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -84,6 +85,9 @@ app.use('/api/posts', userPostRoutes);
 app.use('/api/reviews', userReviewRoutes);
 app.use('/api/notifications', userNotificationRoutes);
 app.use('/api/debug', debugRoutes); // Temporary debug routes
+
+// Public admin endpoints (no auth required)
+app.get('/api/admin/posts/:id/image', getPostImage);
 
 // admin routes
 app.use('/api/admin/auth', adminAuthRoutes);

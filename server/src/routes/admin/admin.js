@@ -53,11 +53,7 @@ import { uploadPostImage, handleUploadError } from '../../middleware/upload.js';
 
 const router = express.Router();
 
-// PUBLIC ROUTES (no auth required)
-// Post images are public content
-router.get('/posts/:id/image', getPostImage);
-
-// All routes below require authentication and admin role
+// All routes require authentication and admin role
 router.use(authenticate);
 router.use(requireAdmin);
 
