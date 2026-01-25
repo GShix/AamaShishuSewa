@@ -1,5 +1,6 @@
 // server/src/controllers/admin/postController.js
 import { supabaseAdmin } from '../../config/supabase.js';
+import { notifyAllUsersAboutPost } from '../../services/postNotificationService.js';
 
 export const getAllPosts = async (req, res) => {
   try {
@@ -86,6 +87,17 @@ export const createPost = async (req, res) => {
 
     if (error) throw error;
 
+    // Send AI-powered notifications to all users if post is published
+    if (post.published) {
+      try {
+        const notificationResult = await notifyAllUsersAboutPost(post);
+        console.log(`✅ Post notifications: ${notificationResult.message}`);
+      } catch (notifError) {
+        console.error('⚠️ Failed to send post notifications:', notifError);
+        // Don't fail the post creation if notifications fail
+      }
+    }
+
     res.status(201).json({
       message: 'Post created successfully',
       post: {
@@ -105,6 +117,9 @@ export const updatePost = async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
 
+    // Check if post is being published (draft -> published)
+    const wasPublished = req.body.published === true;
+
     delete updateData.id;
     delete updateData.created_at;
     delete updateData.author_id;
@@ -118,6 +133,11 @@ export const updatePost = async (req, res) => {
       updateData.image_data = base64String;
     }
 
+    // Set published_at timestamp if publishing now
+    if (wasPublished && !updateData.published_at) {
+      updateData.published_at = new Date().toISOString();
+    }
+
     const { data: post, error } = await supabaseAdmin
       .from('posts')
       .update(updateData)
@@ -129,6 +149,16 @@ export const updatePost = async (req, res) => {
 
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Send notifications if post was just published
+    if (wasPublished) {
+      try {
+        const notificationResult = await notifyAllUsersAboutPost(post);
+        console.log(`✅ Post update notifications: ${notificationResult.message}`);
+      } catch (notifError) {
+        console.error('⚠️ Failed to send update notifications:', notifError);
+      }
     }
 
     res.status(200).json({

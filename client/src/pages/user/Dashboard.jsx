@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { userAPI, servicesAPI, jobsAPI, postsAPI } from '../../utils/api';
 import ProfileSettings from '../../components/user/ProfileSettings';
 import UserMobileBottomNav from '../../components/common/UserMobileBottomNav';
+import NotificationBell from '../../components/common/NotificationBell';
 import { 
   Calendar, 
   Clock, 
@@ -1421,11 +1422,8 @@ const Dashboard = () => {
               <span className="hidden sm:inline">{language === 'ne' ? 'EN' : 'ने'}</span>
             </button>
 
-            {/* Notifications */}
-            <button className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg lg:rounded-xl transition touch-manipulation">
-              <Bell className="w-4 lg:w-5 h-4 lg:h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
-            </button>
+            {/* Notifications - Use NotificationBell component */}
+            <NotificationBell language={language} />
 
             {/* User Avatar */}
             <button
