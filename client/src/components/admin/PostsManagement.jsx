@@ -268,15 +268,15 @@ const PostsManagement = () => {
             return (
             <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               {/* Post Image */}
-              {(fullImageUrl || post.has_image) && (
+              {fullImageUrl && (
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img 
                     src={fullImageUrl} 
                     alt={post.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
-                      console.error('Image load error for post:', post.id);
+                      e.target.style.display = 'none';
+                      e.target.parentElement.style.display = 'none';
                     }}
                   />
                 </div>
