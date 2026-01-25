@@ -116,7 +116,17 @@ export const login = async (req, res) => {
       .or(`email.eq.${email},phone.eq.${email}`)
       .single();
 
-    if (error || !user) {
+    if (error) {
+      console.error('Database error during login:', error);
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      // Other database errors
+      return res.status(500).json({ error: 'Database error. Please try again.' });
+    }
+
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
