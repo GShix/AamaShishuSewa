@@ -53,7 +53,11 @@ import { uploadPostImage, handleUploadError } from '../../middleware/upload.js';
 
 const router = express.Router();
 
-// All routes require authentication and admin role
+// PUBLIC ROUTES (no auth required)
+// Post images are public content
+router.get('/posts/:id/image', getPostImage);
+
+// All routes below require authentication and admin role
 router.use(authenticate);
 router.use(requireAdmin);
 
@@ -101,7 +105,6 @@ router.get('/posts', getAllPosts);
 router.post('/posts', createPost);
 router.put('/posts/:id', updatePost);
 router.delete('/posts/:id', deletePost);
-router.get('/posts/:id/image', getPostImage);
 
 // FILE UPLOAD for posts
 router.post('/upload/post-image', uploadPostImage.single('image'), handleUploadError, async (req, res) => {

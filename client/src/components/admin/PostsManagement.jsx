@@ -257,32 +257,27 @@ const PostsManagement = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => {
-            const serverUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8000';
-            const imageUrl = post.image_preview_url 
-              ? `${serverUrl}${post.image_preview_url}` 
-              : post.image_url;
-            
-            // Debug logging
-            if (post.has_image || post.image_preview_url) {
-              console.log('Post Image Debug:', {
-                id: post.id,
-                has_image: post.has_image,
-                image_preview_url: post.image_preview_url,
-                serverUrl,
-                finalImageUrl: imageUrl
-              });
-            }
+            // Use helper function to construct image URL
+            const imageUrl = post.image_preview_url || post.image_url;
+            const fullImageUrl = imageUrl 
+              ? (imageUrl.startsWith('http') 
+                  ? imageUrl 
+                  : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'}${imageUrl}`)
+              : null;
             
             return (
             <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               {/* Post Image */}
-              {(imageUrl || post.has_image) && (
+              {(fullImageUrl || post.has_image) && (
                 <div className="h-48 bg-gray-200 overflow-hidden">
                   <img 
-                    src={imageUrl} 
+                    src={fullImageUrl} 
                     alt={post.title}
                     className="w-full h-full object-cover"
-                    onError={(e) => e.target.src = 'https://via.placeholder.com/400x300?text=No+Image'}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                      console.error('Image load error for post:', post.id);
+                    }}
                   />
                 </div>
               )}

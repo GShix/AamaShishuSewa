@@ -154,4 +154,14 @@ export const postsAPI = {
   getPostById: (id) => api.get(`/posts/${id}`),
 };
 
+// Helper function to get image URL (for <img> tags)
+// Images don't need authentication, so use direct URL
+export const getImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path; // External URL
+  
+  const baseURL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000';
+  return `${baseURL}${path}`;
+};
+
 export default api;
