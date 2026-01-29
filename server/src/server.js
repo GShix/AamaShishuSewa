@@ -33,21 +33,15 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Middleware
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'https://aama-shishu-sewa.vercel.app', // legacy domain with double hyphen
-  'https://aamashishu-sewa.vercel.app', // current Vercel domain
-  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
-].filter(Boolean);
-
 app.use(helmet({
   crossOriginResourcePolicy: false,
   crossOriginOpenerPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: [
+    process.env.CLIENT_URL || 'https://aama-shishu-sewa.vercel.app',
+  ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
