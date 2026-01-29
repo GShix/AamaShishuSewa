@@ -8,10 +8,17 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../uploads/posts');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Ensure uploads directory exists; use writable tmp on Vercel
+const uploadsDir = process.env.VERCEL === '1'
+  ? '/tmp/uploads/posts'
+  : path.join(__dirname, '../../uploads/posts');
+
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (err) {
+  console.error('Failed to initialize upload directory:', err);
 }
 
 // Configure storage
