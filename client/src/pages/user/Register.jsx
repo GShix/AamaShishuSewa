@@ -373,7 +373,7 @@ const Register = () => {
                     </div>
                   </button>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => {
                       setFormData({...formData, role: 'caregiver'});
@@ -401,7 +401,7 @@ const Register = () => {
                         <CheckCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
                       )}
                     </div>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             )}

@@ -50,7 +50,9 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [language, setLanguage] = useState('ne');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   // Careers section state
   const [selectedJob, setSelectedJob] = useState(null);
@@ -226,6 +228,33 @@ const Dashboard = () => {
     navigate('/');
   };
 
+  const confirmLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const onClick = (e) => {
+      const menu = document.getElementById('user-menu-dropdown');
+      const btn = document.getElementById('user-menu-button');
+      if (!menu || !btn) return;
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    if (showUserMenu) document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [showUserMenu]);
+
+  // Modal confirm handler
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    handleLogout();
+  };
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
+
   const handleBookService = (service) => {
     setSelectedService(service);
     setBookingData(prev => ({
@@ -366,17 +395,46 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-gray-900">
               {language === 'ne' ? 'हालका बुकिङहरू' : 'Recent Bookings'}
             </h2>
-            <button
-              onClick={() => setActiveTab('bookings')}
-              className="text-rose-600 hover:text-rose-700 font-medium text-sm"
-            >
-              {language === 'ne' ? 'सबै हेर्नुहोस्' : 'View All'} →
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setActiveTab('bookings')}
+                className="text-rose-600 hover:text-rose-700 font-medium text-sm"
+              >
+                {language === 'ne' ? 'सबै हेर्नुहोस्' : 'View All'} →
+              </button>
+
+              {/* User Avatar + Dropdown Menu */}
+              <div className="relative">
+                <button
+                  id="user-menu-button"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-8 h-8 lg:w-10 lg:h-10 bg-linear-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white text-sm lg:text-base font-bold shadow-md cursor-pointer hover:shadow-lg transition touch-manipulation"
+                  title="User menu"
+                >
+                  {user?.fullName?.charAt(0).toUpperCase() || user?.full_name?.charAt(0).toUpperCase()}
+                </button>
+
+                {showUserMenu && (
+                  <div id="user-menu-dropdown" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                    <button onClick={() => { setActiveTab('profile'); setShowUserMenu(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2">
+                      <User className="w-4 h-4" /> <span>Profile</span>
+                    </button>
+                    <button onClick={() => { setActiveTab('settings'); setShowUserMenu(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2">
+                      <Settings className="w-4 h-4" /> <span>Settings</span>
+                    </button>
+                    <div className="border-t" />
+                    <button onClick={() => { setShowUserMenu(false); confirmLogout(); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-red-600 flex items-center gap-2">
+                      <LogOut className="w-4 h-4" /> <span>{language === 'ne' ? 'लगआउट' : 'Logout'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
+          {/* Logic for Empty vs Table */}
           {bookings.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">
                 {language === 'ne' ? 'तपाईंसँग अहिलेसम्म कुनै बुकिङ छैन' : 'No bookings yet'}
               </p>
@@ -431,7 +489,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <button
             onClick={() => navigate('/book-appointment')}
-            className="bg-gradient-to-r from-rose-500 to-orange-500 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
+            className="bg-linear-to-r from-rose-500 to-orange-500 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
@@ -446,7 +504,7 @@ const Dashboard = () => {
 
           <button
             onClick={() => setActiveTab('bookings')}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
+            className="bg-linear-to-r from-blue-500 to-blue-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
@@ -461,7 +519,7 @@ const Dashboard = () => {
 
           <button
             onClick={() => setActiveTab('appointments')}
-            className="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
+            className="bg-linear-to-r from-teal-500 to-teal-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
@@ -476,7 +534,7 @@ const Dashboard = () => {
 
           <button
             onClick={() => setActiveTab('profile')}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
+            className="bg-linear-to-r from-purple-500 to-purple-600 text-white p-4 lg:p-6 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-between group touch-manipulation"
           >
             <div className="text-left">
               <h3 className="font-bold text-base lg:text-lg">
@@ -545,7 +603,7 @@ const Dashboard = () => {
 
                 <button
                   onClick={() => handleBookService(service)}
-                  className="w-full py-2.5 lg:py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2 touch-manipulation"
+                  className="w-full py-2.5 lg:py-3 bg-linear-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2 touch-manipulation"
                 >
                   <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
                   {language === 'ne' ? 'बुक गर्नुहोस्' : 'Book Now'}
@@ -566,7 +624,7 @@ const Dashboard = () => {
         </h2>
         <button
           onClick={() => setActiveTab('services')}
-          className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
+          className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-linear-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
         >
           <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
           <span>{language === 'ne' ? 'नयाँ बुकिङ' : 'New Booking'}</span>
@@ -582,7 +640,7 @@ const Dashboard = () => {
           <p className="text-sm lg:text-base text-gray-500 mb-6">{t.createFirst}</p>
           <button
             onClick={() => setActiveTab('services')}
-            className="px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform touch-manipulation"
+            className="px-6 lg:px-8 py-2.5 lg:py-3 bg-linear-to-r from-rose-500 to-orange-500 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform touch-manipulation"
           >
             {language === 'ne' ? 'सेवा ब्राउज गर्नुहोस्' : 'Browse Services'}
           </button>
@@ -595,7 +653,7 @@ const Dashboard = () => {
               className="bg-white rounded-xl lg:rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden group"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-rose-500 to-orange-500 p-4">
+              <div className="bg-linear-to-r from-rose-500 to-orange-500 p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-lg font-bold text-white">
                     {t.service[booking.service_type]}
@@ -610,7 +668,7 @@ const Dashboard = () => {
               {/* Body */}
               <div className="p-5 space-y-3">
                 <div className="flex items-start space-x-3">
-                  <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                  <Calendar className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">{t.date}</p>
                     <p className="font-semibold text-gray-800">
@@ -620,7 +678,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <Clock className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                  <Clock className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">{t.duration}</p>
                     <p className="font-semibold text-gray-800">
@@ -630,7 +688,7 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500">{t.address}</p>
                     <p className="font-semibold text-gray-800 line-clamp-2">
@@ -641,7 +699,7 @@ const Dashboard = () => {
 
                 {booking.professionals && (
                   <div className="flex items-start space-x-3">
-                    <User className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                    <User className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500">{t.professional}</p>
                       <p className="font-semibold text-gray-800">
@@ -686,7 +744,7 @@ const Dashboard = () => {
         </h2>
         <button
           onClick={() => navigate('/book-appointment')}
-          className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
+          className="flex items-center space-x-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-linear-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-md hover:shadow-lg transition touch-manipulation"
         >
           <Plus className="w-4 lg:w-5 h-4 lg:h-5" />
           <span>{language === 'ne' ? 'नयाँ अपोइन्टमेन्ट' : 'New Appointment'}</span>
@@ -705,7 +763,7 @@ const Dashboard = () => {
         </p>
         <button
           onClick={() => navigate('/book-appointment')}
-          className="px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform touch-manipulation"
+          className="px-6 lg:px-8 py-2.5 lg:py-3 bg-linear-to-r from-teal-500 to-teal-600 text-white text-sm lg:text-base font-bold rounded-lg lg:rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition transform touch-manipulation"
         >
           {language === 'ne' ? 'अपोइन्टमेन्ट बुक गर्नुहोस्' : 'Book Appointment'}
         </button>
@@ -748,7 +806,7 @@ const Dashboard = () => {
             return (
             <div key={post.id} className="bg-white rounded-xl lg:rounded-2xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
               {(imageUrl || post.has_image) && (
-                <div className="h-48 lg:h-64 overflow-hidden bg-gradient-to-br from-rose-100 to-pink-100">
+                <div className="h-48 lg:h-64 overflow-hidden bg-linear-to-br from-rose-100 to-pink-100">
                   <img 
                     src={imageUrl} 
                     alt={post.title}
@@ -949,7 +1007,7 @@ const Dashboard = () => {
                     ) : (
                       <button
                         onClick={() => setSelectedJob(job)}
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:from-blue-600 hover:to-indigo-600 transition"
+                        className="flex-1 px-4 py-2 bg-linear-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:from-blue-600 hover:to-indigo-600 transition"
                       >
                         {language === 'ne' ? 'आवेदन दिनुहोस्' : 'Apply Now'}
                       </button>
@@ -1088,7 +1146,7 @@ const Dashboard = () => {
                       <button
                         type="submit"
                         disabled={applying}
-                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 font-medium disabled:opacity-50"
+                        className="flex-1 px-4 py-2.5 bg-linear-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 font-medium disabled:opacity-50"
                       >
                         {applying ? (
                           <span className="flex items-center justify-center gap-2">
@@ -1249,7 +1307,7 @@ const Dashboard = () => {
                 <button
                   type="submit"
                   disabled={submittingBooking}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-lg hover:from-rose-600 hover:to-orange-600 font-medium disabled:opacity-50 transition"
+                  className="flex-1 px-4 py-2.5 bg-linear-to-r from-rose-500 to-orange-500 text-white rounded-lg hover:from-rose-600 hover:to-orange-600 font-medium disabled:opacity-50 transition"
                 >
                   {submittingBooking ? (
                     <span className="flex items-center justify-center gap-2">
@@ -1298,7 +1356,7 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-linear-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
               {/* <Heart className="w-6 h-6 text-white fill-white" /> */}
               <img className='h-8 w-8 md:h-10 md:w-10 object-contain' src="/logo.png" alt="Logo" />
             </div>
@@ -1309,7 +1367,7 @@ const Dashboard = () => {
         {(sidebarOpen || mobileMenuOpen) && (
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+              <div className="w-12 h-12 bg-linear-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold shadow-md">
                 {user?.fullName?.charAt(0).toUpperCase() || user?.full_name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -1337,7 +1395,7 @@ const Dashboard = () => {
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all group touch-manipulation ${
                   isActive
-                    ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-200'
+                    ? 'bg-linear-to-r from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-200'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
                 title={!sidebarOpen && !mobileMenuOpen ? item.label : ''}
@@ -1358,7 +1416,7 @@ const Dashboard = () => {
               navigate('/');
               setMobileMenuOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all touch-manipulation ${!sidebarOpen && !mobileMenuOpen && 'justify-center'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-linear-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all touch-manipulation ${!sidebarOpen && !mobileMenuOpen && 'justify-center'}`}
             title={!sidebarOpen && !mobileMenuOpen ? (language === 'ne' ? 'होमपेज' : 'Go to Homepage') : ''}
           >
             <Home className="w-5 h-5" />
@@ -1367,8 +1425,8 @@ const Dashboard = () => {
           
           <button
             onClick={() => {
-              handleLogout();
               setMobileMenuOpen(false);
+              confirmLogout();
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all touch-manipulation ${!sidebarOpen && !mobileMenuOpen && 'justify-center'}`}
             title={!sidebarOpen && !mobileMenuOpen ? (language === 'ne' ? 'लगआउट' : 'Logout') : ''}
@@ -1376,6 +1434,32 @@ const Dashboard = () => {
             <LogOut className="w-5 h-5" />
             {(sidebarOpen || mobileMenuOpen) && <span className="text-sm font-medium">{language === 'ne' ? 'लगआउट' : 'Logout'}</span>}
           </button>
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-999 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs mx-auto">
+            <div className="mb-4">
+              <p className="text-lg font-semibold text-gray-900 text-center">
+                {language === 'ne' ? 'के तपाईं निस्चित रूपमा लगआउट गर्न चाहनुहुन्छ?' : 'Are you sure you want to logout?'}
+              </p>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleLogoutCancel}
+                className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50"
+              >
+                {language === 'ne' ? 'रद्द गर्नुहोस्' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="flex-1 py-2 rounded-lg bg-linear-to-r from-red-500 to-orange-500 text-white font-semibold hover:from-red-600 hover:to-orange-600 shadow-lg"
+              >
+                {language === 'ne' ? 'लगआउट' : 'Logout'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1425,14 +1509,32 @@ const Dashboard = () => {
             {/* Notifications - Use NotificationBell component */}
             <NotificationBell language={language} />
 
-            {/* User Avatar */}
-            <button
-              onClick={() => setActiveTab('profile')}
-              className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white text-sm lg:text-base font-bold shadow-md cursor-pointer hover:shadow-lg transition touch-manipulation"
-              title="View Profile"
-            >
-              {user?.fullName?.charAt(0).toUpperCase() || user?.full_name?.charAt(0).toUpperCase()}
-            </button>
+            {/* User Avatar + Dropdown Menu */}
+            <div className="relative">
+              <button
+                id="user-menu-button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-8 h-8 lg:w-10 lg:h-10 bg-linear-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white text-sm lg:text-base font-bold shadow-md cursor-pointer hover:shadow-lg transition touch-manipulation"
+                title="User menu"
+              >
+                {user?.fullName?.charAt(0).toUpperCase() || user?.full_name?.charAt(0).toUpperCase()}
+              </button>
+
+              {showUserMenu && (
+                <div id="user-menu-dropdown" className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                  <button onClick={() => { setActiveTab('profile'); setShowUserMenu(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2">
+                    <User className="w-4 h-4" /> <span>Profile</span>
+                  </button>
+                  <button onClick={() => { setActiveTab('settings'); setShowUserMenu(false); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2">
+                    <Settings className="w-4 h-4" /> <span>Settings</span>
+                  </button>
+                  <div className="border-t" />
+                  <button onClick={() => { setShowUserMenu(false); confirmLogout(); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-red-600 flex items-center gap-2">
+                    <LogOut className="w-4 h-4" /> <span>{language === 'ne' ? 'लगआउट' : 'Logout'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
